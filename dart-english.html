@@ -1,0 +1,2365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  ╔══════════════════════════════════════════╗
+  ║  🎯  Dantyr  —  hidden signature           ║
+  ║  made by Dan Ruseng                        ║
+  ╚══════════════════════════════════════════╝
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dart</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0d0c;--sb:#131210;--card:#1c1b18;--ch:#232118;--bdr:#2e2b26;
+  --t1:#f0ebe3;--t2:#7a7169;--t3:#3e3b37;
+  --acc:#c8a97e;--acc-hover:#a0855a;
+  --sw:240px;--pw:320px;--bh:0px;
+  --radius:12px;
+}
+body.light{
+  --bg:#f2ede5;--sb:#e8e3da;--card:#ddd8ce;--ch:#d4cfc5;--bdr:#c5bfb4;
+  --t1:#1a1714;--t2:#7a7169;--t3:#b0a898;
+  --acc:#8b6e4e;--acc-hover:#6b5035;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px}
+
+/* overlay (standalone: fyld hele vinduet) */
+.dz-overlay{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;z-index:50;animation:dzIn .18s ease}
+@keyframes dzIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);
+  display:flex;align-items:center;justify-content:center;z-index:8000}
+.modal-box{background:var(--card);border:1px solid var(--bdr);border-radius:8px;
+  padding:28px;width:380px;max-width:90vw}
+.modal-title{font-size:16px;font-weight:500;margin-bottom:18px}
+.modal-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+
+/* toasts */
+.toasts{position:fixed;bottom:12px;right:16px;
+  z-index:9000;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{background:var(--card);border:1px solid var(--bdr);border-radius:4px;
+  padding:9px 16px;font-size:13px;animation:tin .2s ease;pointer-events:auto}
+@keyframes tin{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+
+/* ── DART CSS (uddraget fra jukebox.html) ── */
+/* ── DART-APP ── */
+#dart-ov{padding:0;overflow:hidden;--dart-bg-grad:radial-gradient(circle at 50% 0%,rgba(217,169,28,.05),transparent 40%);--dart-card-bg:var(--card);--dart-card-border:var(--bdr);--dart-active-glow:rgba(217,169,28,.3);--dart-num-bg:var(--card);--dart-num-border:var(--bdr);--dart-finish-grad:linear-gradient(145deg,#b67832,#d29343 58%,#77451d);--dart-pattern:none}
+/* Tema-swatch i setup-vælgeren */
+.dart-theme-pills{flex-wrap:wrap}
+/* Game-mode pills: store kort med emoji + body */
+#dart-mode-pills{display:flex;flex-direction:column;gap:8px;width:100%}
+.dart-mode-pill{display:flex!important;align-items:center;gap:14px;padding:12px 16px!important;text-align:left;width:100%;border-radius:12px!important;font-weight:500}
+.dart-mode-emoji{font-size:28px;flex-shrink:0}
+.dart-mode-body{display:flex;flex-direction:column;gap:2px;flex:1}
+.dart-mode-body b{font-size:15px;font-weight:700;color:inherit;letter-spacing:.2px}
+.dart-mode-body small{font-size:12px;opacity:.7;font-weight:400;color:inherit}
+.dart-mode-pill.on .dart-mode-body small{opacity:.85}
+/* Regler-knap (?) ved siden af spil-type label */
+.dart-rules-btn{background:transparent;border:1.5px solid var(--bdr);color:var(--t2);width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:700;cursor:pointer;margin-left:8px;transition:all .15s;font-family:inherit;line-height:1;padding:0;vertical-align:middle}
+.dart-rules-btn:hover{border-color:var(--acc);color:var(--acc);transform:scale(1.1)}
+/* Regler-modal */
+.dart-rules-modal{background:var(--bg);border:1px solid var(--bdr);border-radius:18px;padding:28px 32px;min-width:760px;max-width:90vw;max-height:88vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.4)}
+.dart-rules-head{text-align:center;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--bdr)}
+.dart-rules-title{font-size:24px;font-weight:800;color:var(--t1)}
+.dart-rules-sub{font-size:12px;letter-spacing:2px;color:var(--t3);text-transform:uppercase;font-weight:600;margin-top:4px}
+.dart-rules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.dart-rules-card{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:18px 20px}
+.dart-rules-card-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--bdr)}
+.dart-rules-emoji{font-size:30px}
+.dart-rules-card-head h3{margin:0;font-size:18px;color:var(--t1);font-weight:700}
+.dart-rules-card-body{font-size:13px;line-height:1.55;color:var(--t2)}
+.dart-rules-card-body p{margin:0 0 10px}
+.dart-rules-card-body b{color:var(--t1);font-weight:700}
+.dart-rules-card-body ul{margin:6px 0 12px;padding-left:0;list-style:none}
+.dart-rules-card-body li{margin:4px 0;padding-left:0;line-height:1.5}
+.dart-rules-foot{display:flex;justify-content:center;padding-top:14px}
+.dart-rules-foot .dart-tb-btn{min-width:140px}
+/* ATC target highlight på dart-board */
+.dart-num.is-atc-target{background:linear-gradient(145deg,rgba(217,169,28,.30),rgba(217,169,28,.10))!important;border-color:var(--acc)!important;box-shadow:0 0 18px rgba(217,169,28,.4),inset 0 0 0 2px rgba(217,169,28,.35)!important;transform:scale(1.02)}
+.dart-num.is-atc-target .dart-num-n{color:var(--acc);text-shadow:0 0 12px rgba(217,169,28,.5)}
+body.light .dart-num.is-atc-target .dart-num-n{color:#8a5010;text-shadow:none}
+.dart-theme-pill{display:inline-flex!important;align-items:center;gap:8px;padding-left:8px!important}
+.dart-theme-swatch{width:16px;height:16px;border-radius:4px;display:inline-block;flex-shrink:0;border:1px solid rgba(255,255,255,.2)}
+.dart-theme-swatch-klassisk{background:linear-gradient(135deg,#d29343,#b67832)}
+.dart-theme-swatch-arena{background:linear-gradient(135deg,#1f5c3a,#0d2818)}
+.dart-theme-swatch-vinter{background:linear-gradient(135deg,#6ec3e8,#1a3a5a)}
+.dart-theme-swatch-sport{background:linear-gradient(135deg,#e53935,#1a1a1a)}
+.dart-theme-swatch-premier{background:linear-gradient(135deg,#f0c060,#1a1410);box-shadow:0 0 6px rgba(240,192,96,.4)}
+.dart-theme-swatch-klubhus{background:linear-gradient(135deg,#8b1a1a 0%,#8b1a1a 40%,#e6b94a 40%,#e6b94a 70%,#ece2cf 70%);border:1px solid rgba(120,100,70,.3)}
+
+/* ═══ TEMA: KLASSISK (default) ═══ */
+/* Bruger bare standard-tokens, ingen overrides nødvendige */
+
+/* ═══ TEMA: NEON ═══ */
+/* ═══ TEMA: ARENA (pro turnering — grøn felt + rød accent) ═══ */
+#dart-ov[data-theme="arena"]{--dart-card-bg:linear-gradient(160deg,#1a3a26,#0d2418);--dart-card-border:rgba(120,180,140,.3);--dart-active-glow:rgba(229,57,53,.5);--dart-num-bg:linear-gradient(160deg,#1f4a30,#0e2618);--dart-num-border:rgba(120,180,140,.28);--dart-finish-grad:linear-gradient(145deg,#e53935,#7a1410);--dart-bg-grad:radial-gradient(ellipse at 50% 0%,rgba(40,90,55,.45),transparent 70%);background:#071a10!important}
+#dart-ov[data-theme="arena"] .dart-game,
+#dart-ov[data-theme="arena"] .dart-setup,
+#dart-ov[data-theme="arena"] .dart-winner{background:var(--dart-bg-grad),#071a10}
+#dart-ov[data-theme="arena"] .dart-pcard,
+#dart-ov[data-theme="arena"] .dart-num,
+#dart-ov[data-theme="arena"] .dart-slot,
+#dart-ov[data-theme="arena"] .dart-mult,
+#dart-ov[data-theme="arena"] .dart-turn-bar,
+#dart-ov[data-theme="arena"] .dart-tb-btn,
+#dart-ov[data-theme="arena"] .dart-pill{background:var(--dart-card-bg)!important;border-color:var(--dart-card-border)!important;color:#dff0e0}
+#dart-ov[data-theme="arena"] .dart-pscore,
+#dart-ov[data-theme="arena"] .dart-num-n{color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.4);font-weight:900}
+#dart-ov[data-theme="arena"] .dart-pcard.active{border-color:#e53935!important;box-shadow:0 0 0 2px #e53935,0 0 32px rgba(229,57,53,.35)!important;background:linear-gradient(160deg,#2a1414,#0d2418)!important}
+#dart-ov[data-theme="arena"] .dart-pcard.active .dart-pscore{color:#ffb0a8;text-shadow:0 0 18px rgba(229,57,53,.6)}
+#dart-ov[data-theme="arena"] .dart-mult.on,
+#dart-ov[data-theme="arena"] .dart-finish-btn,
+#dart-ov[data-theme="arena"] .dart-start-btn,
+#dart-ov[data-theme="arena"] .dart-pill.on{background:linear-gradient(145deg,#e53935,#a51e1a)!important;color:#fff!important;font-weight:800;letter-spacing:1px;border:0!important;box-shadow:0 6px 20px rgba(229,57,53,.45),inset 0 1px 0 rgba(255,180,160,.2)!important}
+#dart-ov[data-theme="arena"] .dart-checkout{background:linear-gradient(90deg,rgba(229,57,53,.18),rgba(229,57,53,.04));border-color:rgba(229,57,53,.5);border-left-color:#e53935}
+#dart-ov[data-theme="arena"] .dart-checkout-val{color:#ffd0c8}
+
+/* ═══ TEMA: VINTER (nordisk kølig — lyseblå + sølv) ═══ */
+#dart-ov[data-theme="vinter"]{--dart-card-bg:linear-gradient(170deg,#1e3850,#0e1a2a);--dart-card-border:rgba(180,210,235,.25);--dart-active-glow:rgba(140,200,240,.5);--dart-num-bg:linear-gradient(160deg,#244062,#0f1f30);--dart-num-border:rgba(180,210,235,.22);--dart-finish-grad:linear-gradient(145deg,#7ec0e0,#3a6080);--dart-bg-grad:radial-gradient(ellipse at 50% 0%,rgba(80,140,200,.18),transparent 70%);background:#06101c!important}
+#dart-ov[data-theme="vinter"] .dart-game,
+#dart-ov[data-theme="vinter"] .dart-setup,
+#dart-ov[data-theme="vinter"] .dart-winner{background:var(--dart-bg-grad),#06101c}
+#dart-ov[data-theme="vinter"] .dart-pcard,
+#dart-ov[data-theme="vinter"] .dart-num,
+#dart-ov[data-theme="vinter"] .dart-slot,
+#dart-ov[data-theme="vinter"] .dart-mult,
+#dart-ov[data-theme="vinter"] .dart-turn-bar,
+#dart-ov[data-theme="vinter"] .dart-tb-btn,
+#dart-ov[data-theme="vinter"] .dart-pill{background:var(--dart-card-bg)!important;border-color:var(--dart-card-border)!important;color:#dde8f4}
+#dart-ov[data-theme="vinter"] .dart-pscore,
+#dart-ov[data-theme="vinter"] .dart-num-n{color:#e8f4ff;text-shadow:0 0 16px rgba(140,200,240,.35),0 2px 0 rgba(0,0,0,.5);font-weight:800}
+#dart-ov[data-theme="vinter"] .dart-pcard.active{border-color:#7ec0e0!important;box-shadow:0 0 28px rgba(140,200,240,.4),inset 0 0 0 1px rgba(140,200,240,.35)!important;background:linear-gradient(170deg,#1a4868,#0e1a2a)!important}
+#dart-ov[data-theme="vinter"] .dart-pcard.active .dart-pscore{color:#a8d8f0;text-shadow:0 0 18px rgba(140,200,240,.6)}
+#dart-ov[data-theme="vinter"] .dart-mult.on,
+#dart-ov[data-theme="vinter"] .dart-finish-btn,
+#dart-ov[data-theme="vinter"] .dart-start-btn,
+#dart-ov[data-theme="vinter"] .dart-pill.on{background:linear-gradient(145deg,#a0d4ee,#4878a0)!important;color:#0a1828!important;font-weight:700;border:0!important;box-shadow:0 6px 20px rgba(120,180,220,.4),inset 0 1px 0 rgba(255,255,255,.4)!important}
+#dart-ov[data-theme="vinter"] .dart-checkout{background:linear-gradient(90deg,rgba(140,200,240,.16),rgba(140,200,240,.04));border-color:rgba(140,200,240,.45);border-left-color:#7ec0e0}
+#dart-ov[data-theme="vinter"] .dart-checkout-val{color:#cfe8f8}
+
+/* ═══ TEMA: SPORT ═══ */
+#dart-ov[data-theme="sport"]{--dart-card-bg:#1f1f23;--dart-card-border:rgba(255,255,255,.12);--dart-active-glow:rgba(229,57,53,.55);--dart-num-bg:#26262a;--dart-num-border:rgba(255,255,255,.1);--dart-finish-grad:linear-gradient(135deg,#e53935,#7a0e0c);--dart-bg-grad:linear-gradient(180deg,#0d0d0f,#181818);background:#0d0d0f!important}
+#dart-ov[data-theme="sport"] .dart-game,
+#dart-ov[data-theme="sport"] .dart-setup,
+#dart-ov[data-theme="sport"] .dart-winner{background:var(--dart-bg-grad)}
+#dart-ov[data-theme="sport"] .dart-pcard,
+#dart-ov[data-theme="sport"] .dart-num,
+#dart-ov[data-theme="sport"] .dart-slot,
+#dart-ov[data-theme="sport"] .dart-mult,
+#dart-ov[data-theme="sport"] .dart-turn-bar,
+#dart-ov[data-theme="sport"] .dart-tb-btn,
+#dart-ov[data-theme="sport"] .dart-pill{background:var(--dart-card-bg)!important;border-color:var(--dart-card-border)!important;color:#fff;border-radius:6px!important}
+#dart-ov[data-theme="sport"] .dart-pscore,
+#dart-ov[data-theme="sport"] .dart-num-n{color:#fff;font-weight:900;letter-spacing:-2px}
+#dart-ov[data-theme="sport"] .dart-pcard.active{border-color:#e53935!important;background:linear-gradient(145deg,#2a1414,#1f1f23)!important;box-shadow:0 0 0 2px #e53935,0 0 32px rgba(229,57,53,.4)!important}
+#dart-ov[data-theme="sport"] .dart-mult.on,
+#dart-ov[data-theme="sport"] .dart-finish-btn,
+#dart-ov[data-theme="sport"] .dart-start-btn,
+#dart-ov[data-theme="sport"] .dart-pill.on{background:linear-gradient(135deg,#e53935,#a52522)!important;color:#fff!important;font-weight:900;letter-spacing:1.5px;border:0!important;border-radius:6px!important;box-shadow:0 4px 14px rgba(229,57,53,.5)!important}
+
+/* ═══ TEMA: PREMIER (elegant guld & sort — sober som ur-skive) ═══ */
+#dart-ov[data-theme="premier"]{--dart-card-bg:linear-gradient(180deg,#1c160e,#100a04);--dart-card-border:rgba(220,180,90,.3);--dart-active-glow:rgba(240,200,100,.5);--dart-num-bg:linear-gradient(170deg,#241a0e,#100a04);--dart-num-border:rgba(220,180,90,.25);--dart-finish-grad:linear-gradient(145deg,#f0c060,#a07028);--dart-bg-grad:radial-gradient(ellipse at 50% 0%,rgba(80,60,30,.5),transparent 70%);background:#080604!important}
+#dart-ov[data-theme="premier"] .dart-game,
+#dart-ov[data-theme="premier"] .dart-setup,
+#dart-ov[data-theme="premier"] .dart-winner{background:var(--dart-bg-grad),#080604}
+#dart-ov[data-theme="premier"] .dart-pcard,
+#dart-ov[data-theme="premier"] .dart-num,
+#dart-ov[data-theme="premier"] .dart-slot,
+#dart-ov[data-theme="premier"] .dart-mult,
+#dart-ov[data-theme="premier"] .dart-turn-bar,
+#dart-ov[data-theme="premier"] .dart-tb-btn,
+#dart-ov[data-theme="premier"] .dart-pill{background:var(--dart-card-bg)!important;border-color:var(--dart-card-border)!important;color:#f4dcb0}
+#dart-ov[data-theme="premier"] .dart-pscore,
+#dart-ov[data-theme="premier"] .dart-num-n{color:#f0c060;text-shadow:0 0 16px rgba(240,200,100,.35),0 2px 0 rgba(0,0,0,.6);font-weight:900;letter-spacing:-1.5px}
+#dart-ov[data-theme="premier"] .dart-pcard.active{border-color:#f0c060!important;box-shadow:0 0 0 1px #f0c060,0 0 32px rgba(240,200,100,.35)!important;background:linear-gradient(180deg,#241a0e,#100a04)!important}
+#dart-ov[data-theme="premier"] .dart-pcard.active .dart-pscore{color:#ffd870;text-shadow:0 0 20px rgba(255,215,100,.6)}
+#dart-ov[data-theme="premier"] .dart-mult.on,
+#dart-ov[data-theme="premier"] .dart-finish-btn,
+#dart-ov[data-theme="premier"] .dart-start-btn,
+#dart-ov[data-theme="premier"] .dart-pill.on{background:linear-gradient(145deg,#f0c060,#a07028)!important;color:#1a1208!important;font-weight:800;letter-spacing:.5px;border:1px solid rgba(255,220,140,.4)!important;box-shadow:0 6px 18px rgba(180,130,40,.4),inset 0 1px 0 rgba(255,230,160,.4)!important}
+#dart-ov[data-theme="premier"] .dart-checkout{background:linear-gradient(90deg,rgba(240,200,100,.16),rgba(240,200,100,.04));border-color:rgba(240,200,100,.5);border-left-color:#f0c060}
+#dart-ov[data-theme="premier"] .dart-checkout-val{color:#ffd870}
+
+/* ═══ TEMA: KLUBHUS (BSE Sense-vibe — flad cream, dyb-rød aktiv, guld accent) ═══ */
+#dart-ov[data-theme="klubhus"]{--dart-card-bg:#f1e8d4;--dart-card-border:rgba(120,100,70,.32);--dart-active-glow:rgba(139,26,26,.4);--dart-num-bg:#f6efde;--dart-num-border:rgba(120,100,70,.22);--dart-finish-grad:linear-gradient(180deg,#e6b94a,#c89a2e);--dart-bg-grad:linear-gradient(180deg,#ede4d2,#dccfb6);background:#ece2cf!important}
+#dart-ov[data-theme="klubhus"] .dart-game,
+#dart-ov[data-theme="klubhus"] .dart-setup,
+#dart-ov[data-theme="klubhus"] .dart-winner{background:var(--dart-bg-grad)}
+#dart-ov[data-theme="klubhus"] .dart-pcard,
+#dart-ov[data-theme="klubhus"] .dart-num,
+#dart-ov[data-theme="klubhus"] .dart-slot,
+#dart-ov[data-theme="klubhus"] .dart-mult,
+#dart-ov[data-theme="klubhus"] .dart-turn-bar,
+#dart-ov[data-theme="klubhus"] .dart-tb-btn,
+#dart-ov[data-theme="klubhus"] .dart-pill{background:var(--dart-card-bg)!important;border:1px solid var(--dart-card-border)!important;border-radius:4px!important;color:#1a1410;box-shadow:none!important}
+#dart-ov[data-theme="klubhus"] .dart-num{background:var(--dart-num-bg)!important;border-color:var(--dart-num-border)!important}
+#dart-ov[data-theme="klubhus"] .dart-pname,
+#dart-ov[data-theme="klubhus"] .dart-pscore,
+#dart-ov[data-theme="klubhus"] .dart-num-n{color:#1a1410;text-shadow:none;font-weight:800;letter-spacing:-1px}
+#dart-ov[data-theme="klubhus"] .dart-pavg-val,
+#dart-ov[data-theme="klubhus"] .dart-pavg-lbl,
+#dart-ov[data-theme="klubhus"] .dart-pstats,
+#dart-ov[data-theme="klubhus"] .dart-pstats span{color:#3a302a}
+#dart-ov[data-theme="klubhus"] .dart-num-v,
+#dart-ov[data-theme="klubhus"] .dart-pcard-pts,
+#dart-ov[data-theme="klubhus"] .dart-game-lbl,
+#dart-ov[data-theme="klubhus"] .dart-setup-label,
+#dart-ov[data-theme="klubhus"] .dart-setup-lbl{color:#5a4d3e}
+/* AKTIV spiller — split-kort med dyb-rød VENSTRE side, cream HØJRE side */
+#dart-ov[data-theme="klubhus"] .dart-pcard.active{background:#f1e8d4!important;border:1px solid #5a0a0a!important;box-shadow:none!important}
+#dart-ov[data-theme="klubhus"] .dart-pcard.active .dart-pcard-left{background:#8b1a1a!important;color:#fff!important;border-right-color:#5a0a0a!important}
+#dart-ov[data-theme="klubhus"] .dart-pcard.active .dart-pcard-left::before{display:none}
+#dart-ov[data-theme="klubhus"] .dart-pcard.active .dart-pname,
+#dart-ov[data-theme="klubhus"] .dart-pcard.active .dart-pscore,
+#dart-ov[data-theme="klubhus"] .dart-pcard.active .dart-pcard-turnlbl{color:#fff!important;text-shadow:none}
+#dart-ov[data-theme="klubhus"] .dart-pcard.active .dart-pdot{background:#ffb8a8!important;box-shadow:0 0 8px rgba(255,200,180,.5)!important}
+#dart-ov[data-theme="klubhus"] .dart-pcard.active .dart-pcard-pts{color:#fff!important;background:rgba(255,255,255,.18)!important}
+/* Inaktive kort i Klubhus — fladt cream på begge sider */
+#dart-ov[data-theme="klubhus"] .dart-pcard{background:#f1e8d4!important}
+#dart-ov[data-theme="klubhus"] .dart-pcard-left{background:#ede2c8!important;border-right-color:rgba(120,100,70,.25)!important}
+#dart-ov[data-theme="klubhus"] .dart-pcard-right{background:#f6efde!important}
+#dart-ov[data-theme="klubhus"] .dart-pcard-stat-val{color:#1a1410}
+#dart-ov[data-theme="klubhus"] .dart-pcard-stat-lbl{color:#5a4d3e}
+#dart-ov[data-theme="klubhus"] .dart-pcard-turnlbl{color:#5a4d3e}
+/* Multiplier + finish + start — varm guld som NEXT PLAYER */
+#dart-ov[data-theme="klubhus"] .dart-mult.on,
+#dart-ov[data-theme="klubhus"] .dart-finish-btn,
+#dart-ov[data-theme="klubhus"] .dart-start-btn,
+#dart-ov[data-theme="klubhus"] .dart-pill.on{background:linear-gradient(180deg,#e6b94a,#c89a2e)!important;border:1px solid #a07c1c!important;color:#1a1410!important;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;box-shadow:none!important;text-shadow:none}
+#dart-ov[data-theme="klubhus"] .dart-finish-btn:disabled{opacity:.4}
+/* Turn-name + checkout — dyb-rød accent */
+#dart-ov[data-theme="klubhus"] .dart-turn-name{color:#8b1a1a;text-shadow:none;font-weight:900;letter-spacing:2px}
+#dart-ov[data-theme="klubhus"] .dart-checkout{background:rgba(139,26,26,.08);border:1px solid rgba(139,26,26,.4);border-left:4px solid #8b1a1a;color:#1a1410}
+#dart-ov[data-theme="klubhus"] .dart-checkout-val{color:#8b1a1a;font-weight:900}
+#dart-ov[data-theme="klubhus"] .dart-checkout-lbl,
+#dart-ov[data-theme="klubhus"] .dart-checkout-meta{color:#3a302a}
+/* Aktiv pil-slot — stiplet dyb-rød kant */
+#dart-ov[data-theme="klubhus"] .dart-slot.next{border-color:#8b1a1a!important;border-style:dashed;background:rgba(139,26,26,.05)!important}
+#dart-ov[data-theme="klubhus"] .dart-slot-lbl{color:#5a4d3e}
+#dart-ov[data-theme="klubhus"] .dart-slot-val,
+#dart-ov[data-theme="klubhus"] .dart-slot-pts{color:#1a1410}
+/* Bull/Bullseye/Miss/Undo — bevar rød accent */
+#dart-ov[data-theme="klubhus"] .dart-num-bull{background:#f1e8d4!important;border-color:rgba(139,26,26,.4)!important}
+#dart-ov[data-theme="klubhus"] .dart-num-bull .dart-num-n{color:#8b1a1a}
+#dart-ov[data-theme="klubhus"] .dart-num-bullseye{background:#f1d4d0!important;border-color:rgba(139,26,26,.55)!important}
+#dart-ov[data-theme="klubhus"] .dart-num-bullseye .dart-num-n{color:#5a0a0a}
+#dart-ov[data-theme="klubhus"] .dart-num-undo .dart-num-n{color:#8b1a1a}
+/* Banter-stribe nederst — match cream-paletten */
+#dart-ov[data-theme="klubhus"] .dart-banter-side{background:#f1e8d4;border-color:var(--dart-card-border);border-radius:4px}
+#dart-ov[data-theme="klubhus"] .dart-banter-best{background:linear-gradient(180deg,rgba(80,140,60,.12),rgba(80,140,60,.04));border-color:rgba(80,140,60,.35)}
+#dart-ov[data-theme="klubhus"] .dart-banter-best .dart-banter-side-val{color:#2a6020;text-shadow:none}
+#dart-ov[data-theme="klubhus"] .dart-banter-worst{background:linear-gradient(180deg,rgba(180,40,40,.12),rgba(180,40,40,.04));border-color:rgba(180,40,40,.35)}
+#dart-ov[data-theme="klubhus"] .dart-banter-worst .dart-banter-side-val{color:#8b1a1a;text-shadow:none}
+#dart-ov[data-theme="klubhus"] .dart-banter-side-lbl,
+#dart-ov[data-theme="klubhus"] .dart-banter-side-name{color:#3a302a}
+#dart-ov[data-theme="klubhus"] .dart-commentary{color:#1a1410;background:linear-gradient(180deg,rgba(230,185,74,.18),rgba(230,185,74,.05));border:1px solid rgba(200,154,46,.45);border-radius:4px}
+/* Hover-feedback */
+#dart-ov[data-theme="klubhus"] .dart-num:hover{background:#ede2c8!important;border-color:rgba(139,26,26,.4)!important}
+#dart-ov[data-theme="klubhus"] .dart-num:active{transform:scale(.96)}
+
+.dart-setup{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;overflow-y:auto;background:radial-gradient(circle at 30% 20%,rgba(217,169,28,.08),transparent 50%),var(--bg)}
+.dart-setup-box{max-width:540px;width:100%;background:var(--card);border:1px solid var(--bdr);border-radius:18px;padding:40px 44px;box-shadow:0 24px 60px rgba(0,0,0,.4)}
+.dart-setup-lbl{font-size:11px;letter-spacing:4px;color:var(--acc);text-transform:uppercase;font-weight:700;margin-bottom:10px}
+.dart-setup-h{font-size:30px;font-weight:700;color:var(--t1);margin:0 0 4px;letter-spacing:-.3px}
+.dart-setup-credit{font-size:12px;color:var(--t2);margin:0 0 30px;letter-spacing:.4px}
+.dart-setup-row{margin-bottom:24px}
+.dart-setup-label{font-size:11px;letter-spacing:2px;color:var(--t2);text-transform:uppercase;font-weight:600;margin-bottom:10px}
+.dart-setup-pills{display:flex;gap:10px}
+.dart-pill{background:transparent;border:1.5px solid var(--bdr);color:var(--t2);padding:10px 22px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:600;font-family:inherit;transition:all .15s}
+.dart-pill:hover{border-color:var(--acc);color:var(--t1)}
+.dart-pill.on{background:var(--acc);border-color:var(--acc);color:#12100b}
+.dart-setup-players{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.dart-player-row{display:flex;gap:8px;align-items:center}
+.dart-player-input{flex:1;background:var(--ch);border:1.5px solid var(--bdr);border-radius:8px;padding:10px 14px;font-size:14px;color:var(--t1);font-family:inherit;outline:none;transition:border-color .15s}
+.dart-player-input:focus{border-color:var(--acc)}
+.dart-player-remove{background:transparent;border:1px solid var(--bdr);color:var(--t2);border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:12px;display:grid;place-items:center;flex-shrink:0;transition:all .15s}
+.dart-player-remove:hover{border-color:#c55d3f;color:#c55d3f}
+.dart-add-player{background:transparent;border:1px dashed var(--bdr);color:var(--t2);padding:8px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;width:fit-content;letter-spacing:.5px;transition:all .15s}
+.dart-add-player:hover{border-color:var(--acc);color:var(--t1)}
+.dart-setup-toggle{display:flex;align-items:center}
+.dart-toggle{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--t2)}
+.dart-toggle input{width:18px;height:18px;accent-color:var(--acc);cursor:pointer}
+.dart-start-btn{background:linear-gradient(145deg,#b67832,#d29343 58%,#77451d);color:#fff8ec;border:0;border-radius:10px;padding:14px 32px;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:inherit;width:100%;box-shadow:0 12px 30px rgba(184,112,40,.32),inset 0 1px 0 rgba(255,255,255,.2);transition:transform .14s,box-shadow .14s}
+.dart-start-btn:hover{transform:translateY(-1px);box-shadow:0 14px 36px rgba(184,112,40,.45)}
+.dart-start-btn:active{transform:scale(.98)}
+/* Spil-tilstand */
+.dart-game{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:18px 22px 148px;gap:16px;background:radial-gradient(circle at 50% 0%,rgba(217,169,28,.05),transparent 40%),var(--bg);position:relative}
+/* Bottom-bar: stats-fold + banter-stribe pinnet til allernederste kant */
+.dart-bottom-bar{position:absolute;left:22px;right:22px;bottom:10px;display:flex;flex-direction:column;align-items:stretch;gap:4px;pointer-events:none;z-index:2}
+.dart-bottom-bar > *{pointer-events:auto}
+.dart-bottom-bar details[open]{background:var(--bg);border-radius:14px;padding:4px 0;box-shadow:0 -8px 24px rgba(0,0,0,.25)}
+/* Pi/narrow: reservér mere plads siden banter-row staker (uden stats-fold) */
+@media(max-width:1100px){
+  .dart-game{padding-bottom:230px}
+}
+.dart-topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-shrink:0;flex-wrap:wrap}
+.dart-topbar-left{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
+.dart-game-lbl{font-size:13px;letter-spacing:2px;color:rgba(255,255,255,.75);text-transform:uppercase;font-weight:700}
+body.light .dart-game-lbl{color:rgba(0,0,0,.7)}
+.dart-mini-standings{display:flex;gap:8px;flex-wrap:wrap;font-size:11px}
+/* Round-out banner: vises i topbar når en vinder er fundet men runden ikke er færdig */
+.dart-roundout-banner{display:inline-flex;align-items:center;gap:10px;margin-top:6px;padding:6px 14px;background:linear-gradient(90deg,rgba(217,169,28,.20),rgba(217,169,28,.06));border:1px solid rgba(217,169,28,.45);border-radius:999px;font-size:12px;font-weight:600;color:var(--acc);letter-spacing:.3px;animation:dart-roundout-pulse 2.4s ease-in-out infinite}
+.dart-roundout-end{background:rgba(217,169,28,.18);border:1px solid rgba(217,169,28,.5);color:var(--acc);padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:all .15s}
+.dart-roundout-end:hover{background:rgba(217,169,28,.32);transform:translateY(-1px)}
+@keyframes dart-roundout-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,169,28,.3)}50%{box-shadow:0 0 0 6px rgba(217,169,28,0)}}
+body.light .dart-roundout-banner{color:#8a5010;background:linear-gradient(90deg,rgba(180,130,30,.18),rgba(180,130,30,.06));border-color:rgba(180,130,30,.45)}
+.dart-mini-row{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(255,255,255,.06);border:1px solid var(--bdr);border-left:3px solid var(--p-color);border-radius:6px;color:rgba(255,255,255,.85);letter-spacing:.3px;font-weight:600;font-size:12px}
+.dart-mini-row b{color:#fff;font-weight:800;font-variant-numeric:tabular-nums}
+body.light .dart-mini-row{background:rgba(0,0,0,.04);color:rgba(0,0,0,.78)}
+body.light .dart-mini-row b{color:#1c1814}
+.dart-topbar-btns{display:flex;gap:8px}
+.dart-tb-btn{background:transparent;border:1px solid var(--bdr);color:var(--t2);padding:8px 16px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;letter-spacing:.5px;transition:all .15s}
+.dart-tb-btn:hover{border-color:var(--acc);color:var(--t1);background:rgba(217,169,28,.06)}
+.dart-players{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;flex-shrink:0}
+/* ═══ SPILLER-KORT (split layout — venstre identitet, højre stats) ═══ */
+.dart-pcard{background:var(--card);border:1.5px solid var(--bdr);border-radius:14px;padding:0;transition:all .2s;position:relative;overflow:hidden;--p-color:#d29343;--p-color-light:#8a5010;display:grid;grid-template-columns:minmax(150px,1.4fr) minmax(140px,1fr);min-height:148px}
+.dart-pcard-left{padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between;gap:8px;background:var(--ch);border-right:1px solid var(--bdr);border-radius:14px 0 0 14px;position:relative;overflow:hidden}
+.dart-pcard-left::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--p-color);opacity:.4}
+.dart-pcard-right{padding:12px 14px;display:flex;flex-direction:column;justify-content:space-around;gap:6px}
+.dart-pcard.active .dart-pcard-left{background:linear-gradient(145deg,color-mix(in srgb,var(--p-color) 80%,#000),color-mix(in srgb,var(--p-color) 65%,#000));color:#fff}
+.dart-pcard.active .dart-pcard-left::before{opacity:0}
+.dart-pcard.active{border-color:var(--p-color);box-shadow:0 0 28px color-mix(in srgb,var(--p-color) 30%,transparent)}
+.dart-pcard.won .dart-pcard-left{background:linear-gradient(145deg,#b08a1c,#76570f);color:#fff}
+.dart-pcard.won{border-color:#f0c060}
+.dart-pname{font-size:14px;font-weight:800;color:var(--t1);letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.dart-pdot{width:9px;height:9px;border-radius:50%;background:var(--p-color);box-shadow:0 0 8px var(--p-color);flex-shrink:0}
+.dart-pcard.active .dart-pname{color:#fff}
+.dart-pcard.active .dart-pdot{background:#fff;box-shadow:0 0 8px rgba(255,255,255,.5)}
+.dart-pcard.won .dart-pname{color:#fff}
+.dart-pcard.won .dart-pdot{background:#fff}
+.dart-pcard-pts{margin-left:auto;font-size:11px;letter-spacing:.5px;color:var(--p-color);background:color-mix(in srgb,var(--p-color) 14%,transparent);padding:2px 8px;border-radius:999px;font-weight:800}
+.dart-pcard.active .dart-pcard-pts,
+.dart-pcard.won .dart-pcard-pts{color:rgba(255,255,255,.9);background:rgba(255,255,255,.15)}
+.dart-pscore{font-size:54px;font-weight:900;color:var(--t1);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-2px;text-align:center;flex:1;display:flex;align-items:center;justify-content:center}
+.dart-pcard.active .dart-pscore{color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.3)}
+.dart-pcard.won .dart-pscore{color:#fff}
+.dart-pcard-turnlbl{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);font-weight:700;text-align:center;min-height:14px}
+.dart-pcard.active .dart-pcard-turnlbl{color:rgba(255,255,255,.85)}
+.dart-pcard.won .dart-pcard-turnlbl{color:rgba(255,255,255,.95)}
+/* Højre side: kompakte ikon-rækker */
+.dart-pcard-stat{display:flex;align-items:center;gap:10px;padding:4px 6px;border-radius:8px;transition:all .2s}
+.dart-pcard-stat-ico{font-size:18px;flex-shrink:0;width:22px;text-align:center;opacity:.85;filter:saturate(.9)}
+.dart-pcard-stat-body{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.15}
+.dart-pcard-stat-lbl{font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dart-pcard-stat-val{font-size:18px;font-weight:800;color:var(--t1);font-variant-numeric:tabular-nums;letter-spacing:-.3px;line-height:1}
+body.light .dart-pcard-left{background:rgba(0,0,0,.025)}
+/* MEDAL-rækker: kun synlige på spilleren der holder game-wide bedste/værste */
+.dart-pcard-stat.is-best{background:linear-gradient(135deg,rgba(100,200,120,.18),rgba(100,200,120,.05));border:1px solid rgba(100,200,120,.45);box-shadow:0 0 16px rgba(100,200,120,.18);padding:5px 8px}
+.dart-pcard-stat.is-best .dart-pcard-stat-ico{font-size:22px;opacity:1;filter:drop-shadow(0 0 6px rgba(100,200,120,.45))}
+.dart-pcard-stat.is-best .dart-pcard-stat-val{font-size:22px;color:#5fc878;text-shadow:0 0 10px rgba(100,200,120,.3)}
+.dart-pcard-stat.is-best .dart-pcard-stat-lbl{color:#5fc878;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-size:10px}
+.dart-pcard-stat.is-worst{background:linear-gradient(135deg,rgba(229,80,80,.16),rgba(229,80,80,.04));border:1px solid rgba(229,80,80,.45);box-shadow:0 0 16px rgba(229,80,80,.15);padding:5px 8px}
+.dart-pcard-stat.is-worst .dart-pcard-stat-ico{font-size:22px;opacity:1}
+.dart-pcard-stat.is-worst .dart-pcard-stat-val{font-size:22px;color:#e85050;text-shadow:0 0 10px rgba(229,80,80,.3)}
+.dart-pcard-stat.is-worst .dart-pcard-stat-lbl{color:#e85050;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-size:10px}
+body.light .dart-pcard-stat.is-best{background:linear-gradient(135deg,rgba(60,160,90,.16),rgba(60,160,90,.04));border-color:rgba(60,160,90,.5)}
+body.light .dart-pcard-stat.is-best .dart-pcard-stat-val,
+body.light .dart-pcard-stat.is-best .dart-pcard-stat-lbl{color:#3a8a4a;text-shadow:none}
+body.light .dart-pcard-stat.is-worst{background:linear-gradient(135deg,rgba(200,60,55,.15),rgba(200,60,55,.04));border-color:rgba(200,60,55,.5)}
+body.light .dart-pcard-stat.is-worst .dart-pcard-stat-val,
+body.light .dart-pcard-stat.is-worst .dart-pcard-stat-lbl{color:#c43838;text-shadow:none}
+/* Klubhus-tema medal-styling — mat på den klassiske tablet-baggrund */
+#dart-ov[data-theme="klubhus"] .dart-pcard-stat.is-best{background:linear-gradient(135deg,rgba(40,140,70,.20),rgba(40,140,70,.06))!important;border-color:rgba(40,140,70,.55)!important;box-shadow:none!important}
+#dart-ov[data-theme="klubhus"] .dart-pcard-stat.is-best .dart-pcard-stat-val,
+#dart-ov[data-theme="klubhus"] .dart-pcard-stat.is-best .dart-pcard-stat-lbl{color:#2a6020!important;text-shadow:none}
+#dart-ov[data-theme="klubhus"] .dart-pcard-stat.is-worst{background:linear-gradient(135deg,rgba(139,26,26,.20),rgba(139,26,26,.06))!important;border-color:rgba(139,26,26,.55)!important;box-shadow:none!important}
+#dart-ov[data-theme="klubhus"] .dart-pcard-stat.is-worst .dart-pcard-stat-val,
+#dart-ov[data-theme="klubhus"] .dart-pcard-stat.is-worst .dart-pcard-stat-lbl{color:#8b1a1a!important;text-shadow:none}
+.dart-stat-180{background:rgba(217,169,28,.18)!important;color:#f0c060!important;font-weight:700}
+.dart-stat-140{background:rgba(217,169,28,.10)!important;color:#d8a85c!important}
+.dart-stat-100{background:rgba(217,169,28,.06)!important;color:#c89860!important}
+.dart-stat-bust{background:rgba(197,93,63,.14)!important;color:#c55d3f!important}
+body.light .dart-stat-180{color:#8a5010!important}
+body.light .dart-stat-140{color:#9a6020!important}
+body.light .dart-stat-100{color:#a07030!important}
+.dart-plast{font-size:13px;color:rgba(255,255,255,.7);margin-top:10px;font-style:italic}
+body.light .dart-plast{color:rgba(0,0,0,.65)}
+
+/* SKJUL kø-panel når dart er aktivt — så vi får mere plads til dartspillet */
+body.dart-active .panel{display:none!important}
+body.dart-active .main{margin-right:0}
+body.dart-active #dart-ov{right:0!important;bottom:0!important;inset:0!important}
+/* Skjul nu-spiller-baren (.bb) når dart er aktiv — ellers efterlader den en tom stribe
+   nederst hvor commentary ikke kan nå ned. Samme princip som body.havehus-active. */
+body.dart-active .bb{display:none!important}
+
+/* Havehus-overlay: behold kø-panel synligt (havehus fylder kun midten — masser af plads) */
+/* body.havehus-active .panel{display:none!important}  ← fjernet, panel skal være synligt */
+
+/* Havehus-overlay skal nå HELT til bunden af siden — ellers vises der en tom
+   strimmel under panelet hvor nu-spiller-baren normalt ville være (var(--bh)).
+   Den strimmel skaber en synlig linje på tværs af bunden. */
+body.havehus-active #havehus-ov.dz-overlay{
+  inset:0 !important;
+}
+/* Skjul den nederste nu-spiller-bar når havehus er aktiv */
+body.havehus-active .bb{display:none!important}
+/* STUE: samme principper som havehus — fuld overlay, skjul nu-spiller-bar */
+body.stue-active #stue-ov.dz-overlay{ inset:0 !important; }
+body.stue-active .bb{ display:none !important }
+/* Pil-slots + multiplier + dartboard-grid */
+.dart-turn-bar{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:14px 20px;flex-shrink:0}
+.dart-turn-name{font-size:15px;letter-spacing:1.5px;color:var(--acc);text-transform:uppercase;font-weight:800;white-space:nowrap;text-shadow:0 0 12px rgba(217,169,28,.25)}
+body.light .dart-turn-name{text-shadow:none;color:#8a5010}
+.dart-darts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.dart-slot{background:var(--ch);border:1.5px solid var(--bdr);border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .15s;min-height:64px;justify-content:center}
+.dart-slot.next{border-color:var(--acc);border-style:dashed;background:rgba(217,169,28,.04);box-shadow:0 0 12px rgba(217,169,28,.15) inset}
+.dart-slot.filled{background:rgba(217,169,28,.10);border-color:rgba(217,169,28,.45);border-style:solid}
+.dart-slot-lbl{font-size:11px;letter-spacing:2px;color:rgba(255,255,255,.65);text-transform:uppercase;font-weight:700}
+body.light .dart-slot-lbl{color:rgba(0,0,0,.6)}
+.dart-slot-val{font-size:26px;font-weight:800;color:var(--t1);line-height:1;font-variant-numeric:tabular-nums}
+.dart-slot.filled .dart-slot-val{color:#f0c060;text-shadow:0 0 16px rgba(217,169,28,.4)}
+body.light .dart-slot.filled .dart-slot-val{color:#8a5010;text-shadow:none}
+.dart-slot-pts{font-size:12px;color:rgba(255,255,255,.65);letter-spacing:.3px;font-weight:600}
+body.light .dart-slot-pts{color:rgba(0,0,0,.6)}
+.dart-finish-btn{background:linear-gradient(145deg,#b67832,#d29343 58%,#77451d);color:#fff8ec;border:0;border-radius:10px;padding:14px 26px;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:inherit;box-shadow:0 8px 20px rgba(184,112,40,.3),inset 0 1px 0 rgba(255,255,255,.18);transition:transform .14s,box-shadow .14s;white-space:nowrap}
+.dart-finish-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 26px rgba(184,112,40,.45)}
+.dart-finish-btn:disabled{opacity:.3;cursor:not-allowed;box-shadow:none;background:var(--ch);color:var(--t3)}
+
+.dart-checkout{display:flex;align-items:center;gap:14px;background:linear-gradient(90deg,rgba(217,169,28,.18),rgba(217,169,28,.04));border:1px solid rgba(217,169,28,.5);border-left-width:4px;border-radius:10px;padding:12px 20px;flex-shrink:0;animation:dartCheckoutPulse 2.4s ease-in-out infinite}
+@keyframes dartCheckoutPulse{0%,100%{box-shadow:0 0 0 rgba(217,169,28,0)}50%{box-shadow:0 0 16px rgba(217,169,28,.35)}}
+.dart-checkout-lbl{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#f0c060;font-weight:700}
+.dart-checkout-val{font-size:24px;font-weight:800;color:#fff1d2;letter-spacing:.5px;font-variant-numeric:tabular-nums}
+.dart-checkout-meta{font-size:12px;color:var(--t2);margin-left:auto;letter-spacing:.3px}
+body.light .dart-checkout-val{color:#5a3818}
+body.light .dart-checkout-lbl{color:#8a5010}
+.dart-mult-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;flex-shrink:0}
+.dart-mult{background:var(--card);border:1.5px solid var(--bdr);color:var(--t2);padding:14px 12px;font-size:14px;font-weight:700;letter-spacing:1px;border-radius:10px;cursor:pointer;font-family:inherit;transition:all .14s;text-transform:uppercase}
+.dart-mult:hover{border-color:var(--acc);color:var(--t1)}
+.dart-mult.on{background:linear-gradient(145deg,#b67832,#d29343 58%,#77451d);border-color:#d29343;color:#fff8ec;box-shadow:0 6px 18px rgba(184,112,40,.32)}
+
+.dart-board-grid{flex:1;display:grid;grid-template-columns:repeat(6,1fr);gap:8px;min-height:0;align-content:stretch}
+.dart-num{background:var(--card);border:1.5px solid var(--bdr);color:var(--t1);border-radius:10px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 6px;transition:all .12s;user-select:none}
+.dart-num:hover{background:var(--ch);border-color:var(--acc);transform:translateY(-1px)}
+.dart-num:active{transform:scale(.95)}
+.dart-num-n{font-size:30px;font-weight:800;line-height:1;letter-spacing:-1px}
+.dart-num-v{font-size:11px;color:rgba(255,255,255,.6);letter-spacing:.3px;font-weight:600}
+body.light .dart-num-v{color:rgba(0,0,0,.55)}
+.dart-num-bull{background:linear-gradient(145deg,rgba(220,30,30,.18),rgba(180,20,20,.08));border-color:rgba(220,30,30,.4)}
+.dart-num-bull .dart-num-n{color:#e85050}
+.dart-num-bullseye{background:linear-gradient(145deg,rgba(220,30,30,.3),rgba(180,20,20,.15));border-color:rgba(220,30,30,.6)}
+.dart-num-bullseye .dart-num-n{color:#ff6060}
+.dart-num-miss{background:rgba(120,120,120,.06);border-color:rgba(120,120,120,.25)}
+.dart-num-miss .dart-num-n{color:rgba(255,255,255,.55);font-size:20px}
+body.light .dart-num-miss .dart-num-n{color:rgba(0,0,0,.5)}
+.dart-num-undo{background:rgba(197,93,63,.08);border-color:rgba(197,93,63,.35)}
+.dart-num-undo:hover{background:rgba(197,93,63,.18);border-color:rgba(197,93,63,.65)}
+.dart-num-undo .dart-num-n{color:#e87a5a;font-size:32px;font-weight:600}
+.dart-num-undo .dart-num-v{color:rgba(232,122,90,.85)}
+body.light .dart-num-undo .dart-num-n{color:#a82820}
+body.light .dart-num-undo .dart-num-v{color:#a82820}
+/* Winner-skærm */
+.dart-winner{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:18px;padding:30px 40px;background:radial-gradient(circle at 50% 30%,color-mix(in srgb,var(--win-color,#d9a91c) 18%,transparent),transparent 50%),var(--bg);overflow-y:auto;--win-color:#d9a91c}
+.dart-trophy{font-size:96px;filter:drop-shadow(0 0 32px rgba(217,169,28,.4));animation:dartTrophyBounce 1.2s ease-out}
+@keyframes dartTrophyBounce{0%{transform:scale(0) rotate(-30deg)}60%{transform:scale(1.15) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
+.dart-winner-lbl{font-size:14px;letter-spacing:6px;color:var(--acc);text-transform:uppercase;font-weight:700}
+.dart-winner-name{font-size:56px;font-weight:800;color:var(--win-color,var(--t1));letter-spacing:-1px;margin:4px 0;text-shadow:0 0 32px color-mix(in srgb,var(--win-color,#d9a91c) 35%,transparent)}
+body.light .dart-winner-name{text-shadow:none;filter:brightness(.6)}
+.dart-winner-stats{display:flex;gap:36px;margin:18px 0;color:var(--t2);font-size:12px;letter-spacing:1px;text-transform:uppercase;flex-wrap:wrap;justify-content:center}
+.dart-winner-stats > div{display:flex;flex-direction:column;align-items:center;gap:4px}
+.dart-winner-stats b{display:block;color:#f0c060;font-size:36px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-1px;text-shadow:0 0 16px rgba(217,169,28,.3)}
+.dart-winner-stats span{font-size:10px;color:var(--t2)}
+body.light .dart-winner-stats b{color:#8a5010;text-shadow:none}
+/* Turnerings-standings */
+.dart-standings-wrap{width:100%;max-width:680px;background:var(--card);border:1.5px solid var(--bdr);border-radius:16px;padding:18px 22px;margin:8px 0}
+.dart-standings-title{font-size:12px;letter-spacing:2px;color:var(--t2);text-transform:uppercase;font-weight:700;margin-bottom:14px}
+.dart-standings{display:flex;flex-direction:column;gap:8px}
+.dart-stand-row{display:grid;grid-template-columns:48px 1fr auto auto;gap:14px;align-items:center;padding:12px 16px;background:rgba(0,0,0,.025);border:1px solid var(--bdr);border-left:4px solid var(--p-color);border-radius:10px;transition:transform .15s}
+.dart-stand-row:hover{transform:translateX(4px)}
+body.dark .dart-stand-row{background:rgba(255,255,255,.03)}
+.dart-stand-row:first-child{background:color-mix(in srgb,var(--p-color) 12%,transparent);box-shadow:0 0 24px color-mix(in srgb,var(--p-color) 20%,transparent)}
+.dart-stand-place{font-size:24px;text-align:center;line-height:1}
+.dart-stand-name{font-size:17px;font-weight:700;color:var(--t1)}
+.dart-stand-meta{font-size:11px;color:var(--t3);letter-spacing:.3px;white-space:nowrap}
+.dart-stand-pts{text-align:right;display:flex;flex-direction:column;align-items:flex-end;line-height:1}
+.dart-stand-pts b{font-size:24px;font-weight:800;color:var(--p-color);font-variant-numeric:tabular-nums}
+body.light .dart-stand-pts b{filter:brightness(.7)}
+.dart-stand-pts span{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);font-weight:700;margin-top:3px}
+/* Game-stats fold-out */
+.dart-game-stats-fold{margin:6px 0;width:100%;max-width:760px}
+.dart-game-stats-fold summary{cursor:pointer;font-size:11px;letter-spacing:1.5px;color:var(--t2);text-transform:uppercase;font-weight:600;padding:8px 0;text-align:center;user-select:none;transition:color .15s}
+.dart-game-stats-fold summary:hover{color:var(--t1)}
+.dart-game-stats-fold[open] summary{color:var(--t1)}
+/* Banter-stribe i bunden: bedste kast | kommentator | værste kast */
+.dart-banter-row{display:grid;grid-template-columns:minmax(200px,1fr) minmax(0,2.4fr) minmax(200px,1fr);gap:14px;align-items:stretch;padding:8px 6px 4px;width:100%}
+.dart-banter-side{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--bdr);min-height:74px;text-align:center;line-height:1.1}
+.dart-banter-side-lbl{font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:var(--t3);font-weight:700;display:flex;align-items:center;gap:5px}
+.dart-banter-side-main{display:flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:nowrap;width:100%}
+.dart-banter-side-val{font-size:38px;font-weight:800;line-height:1;letter-spacing:-1px;color:var(--t1);font-variant-numeric:tabular-nums}
+.dart-banter-side-name{font-size:18px;color:var(--t1);font-weight:700;display:inline-flex;align-items:center;gap:8px;letter-spacing:.2px;white-space:nowrap}
+/* Stats med Runde + Kast i samme boks */
+.dart-banter-stats{display:flex;flex-direction:column;gap:2px;width:100%}
+.dart-banter-stat-row{display:grid;grid-template-columns:44px auto 1fr;gap:8px;align-items:baseline;width:100%}
+.dart-banter-stat-key{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);font-weight:700;text-align:left}
+.dart-banter-stat-num{font-size:22px;font-weight:800;color:var(--t1);font-variant-numeric:tabular-nums;letter-spacing:-.5px;line-height:1;text-align:center}
+.dart-banter-stat-who{font-size:13px;color:var(--t2);font-weight:600;display:inline-flex;align-items:center;gap:6px;text-align:left;flex-wrap:wrap;line-height:1.4}
+.dart-banter-who-chip{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.dart-banter-who-sep{opacity:.4;margin:0 4px;font-weight:400}
+.dart-banter-tied{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--acc);font-weight:700;padding:2px 6px;background:rgba(217,169,28,.15);border:1px solid rgba(217,169,28,.4);border-radius:999px;margin-left:4px}
+body.light .dart-banter-tied{color:#8a5010;background:rgba(180,130,30,.15);border-color:rgba(180,130,30,.4)}
+.dart-banter-stat-row.is-tied{grid-template-columns:48px auto 1fr}
+.dart-banter-best  .dart-banter-stat-num{color:#66c878;text-shadow:0 0 12px rgba(100,210,130,.3)}
+.dart-banter-worst .dart-banter-stat-num{color:#e85050;text-shadow:0 0 12px rgba(230,90,80,.25)}
+body.light .dart-banter-best  .dart-banter-stat-num{color:#3a8a4a;text-shadow:none}
+body.light .dart-banter-worst .dart-banter-stat-num{color:#c43838;text-shadow:none}
+#dart-ov[data-theme="klubhus"] .dart-banter-best  .dart-banter-stat-num{color:#2a6020;text-shadow:none}
+#dart-ov[data-theme="klubhus"] .dart-banter-worst .dart-banter-stat-num{color:#8b1a1a;text-shadow:none}
+.dart-banter-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--p-color,#d9a91c);box-shadow:0 0 10px var(--p-color,#d9a91c);flex-shrink:0}
+.dart-banter-side-empty{font-size:13px;color:var(--t3);font-style:italic;opacity:.7}
+.dart-banter-best{background:linear-gradient(180deg,rgba(100,210,130,.10),rgba(100,210,130,.04));border-color:rgba(100,210,130,.25)}
+.dart-banter-best .dart-banter-side-val{color:#66c878;text-shadow:0 0 14px rgba(100,210,130,.35)}
+.dart-banter-worst{background:linear-gradient(180deg,rgba(230,90,80,.10),rgba(230,90,80,.04));border-color:rgba(230,90,80,.25)}
+.dart-banter-worst .dart-banter-side-val{color:#e85050;text-shadow:0 0 14px rgba(230,90,80,.3)}
+body.light .dart-banter-side{background:rgba(0,0,0,.03)}
+body.light .dart-banter-best{background:linear-gradient(180deg,rgba(60,160,90,.10),rgba(60,160,90,.04));border-color:rgba(60,160,90,.30)}
+body.light .dart-banter-best .dart-banter-side-val{color:#3a8a4a;text-shadow:none}
+body.light .dart-banter-worst{background:linear-gradient(180deg,rgba(200,60,55,.10),rgba(200,60,55,.04));border-color:rgba(200,60,55,.30)}
+body.light .dart-banter-worst .dart-banter-side-val{color:#c43838;text-shadow:none}
+
+/* Kommentator-stemme: STOR midter-tekst i banter-rækken */
+.dart-commentary{display:flex;align-items:center;justify-content:center;gap:14px;padding:14px 22px;margin:0;font-size:19px;color:rgba(255,255,255,.88);font-style:italic;letter-spacing:.2px;text-align:center;line-height:1.35;flex-shrink:0;transition:opacity .25s;border-radius:14px;background:linear-gradient(180deg,rgba(217,169,28,.06),rgba(217,169,28,.02));border:1px solid rgba(217,169,28,.18);min-height:74px}
+.dart-commentary-mic{font-size:24px;opacity:.85;flex-shrink:0;filter:drop-shadow(0 0 10px rgba(217,169,28,.45))}
+.dart-commentary-text{flex:1;min-width:0}
+body.light .dart-commentary{color:rgba(0,0,0,.78);background:linear-gradient(180deg,rgba(180,120,30,.06),rgba(180,120,30,.02));border-color:rgba(180,120,30,.20)}
+/* Tema-tilpasninger */
+#dart-ov[data-theme="arena"]   .dart-commentary{color:rgba(225,240,225,.9);background:linear-gradient(180deg,rgba(229,57,53,.08),rgba(229,57,53,.02));border-color:rgba(229,57,53,.25)}
+#dart-ov[data-theme="vinter"]  .dart-commentary{color:rgba(220,235,250,.9);background:linear-gradient(180deg,rgba(126,192,224,.08),rgba(126,192,224,.02));border-color:rgba(126,192,224,.25)}
+#dart-ov[data-theme="sport"]   .dart-commentary{color:rgba(255,255,255,.88);background:linear-gradient(180deg,rgba(229,57,53,.08),rgba(229,57,53,.02));border-color:rgba(229,57,53,.28)}
+#dart-ov[data-theme="premier"] .dart-commentary{color:rgba(245,225,180,.95);background:linear-gradient(180deg,rgba(240,192,96,.10),rgba(240,192,96,.03));border-color:rgba(240,192,96,.32)}
+
+/* Responsiv — narrow skærme (Pi-touchskærm i landscape eller portrait) */
+@media(max-width:1100px){
+  .dart-banter-row{grid-template-columns:1fr 1fr;grid-template-areas:'best worst' 'commentary commentary';gap:10px}
+  .dart-banter-best{grid-area:best}
+  .dart-banter-worst{grid-area:worst}
+  .dart-banter-row .dart-commentary{grid-area:commentary;font-size:16px;padding:10px 16px;min-height:54px}
+  .dart-banter-side-val{font-size:22px}
+}
+/* Statistik-fold-out i bunden af dart-spillet (over commentary) */
+.dart-game-stats-bottom{flex-shrink:0;margin:0 auto;max-width:100%;width:100%}
+/* Stats-modal (åbnet fra 📊 i topbar) */
+.dart-stats-modal{background:var(--bg);border:1px solid var(--bdr);border-radius:18px;padding:24px 28px;min-width:680px;max-width:90vw;max-height:84vh;display:flex;flex-direction:column;gap:16px;box-shadow:0 24px 60px rgba(0,0,0,.4)}
+.dart-stats-modal-head{text-align:center;border-bottom:1px solid var(--bdr);padding-bottom:14px}
+.dart-stats-modal-title{font-size:22px;font-weight:800;color:var(--t1);letter-spacing:-.3px}
+.dart-stats-modal-sub{font-size:12px;letter-spacing:2px;color:var(--t3);text-transform:uppercase;font-weight:600;margin-top:4px}
+.dart-stats-modal .dart-winner-table-wrap{border:1px solid var(--bdr);background:var(--card);overflow-x:auto}
+.dart-stats-modal .dart-winner-table{font-size:14px}
+.dart-stats-modal .dart-winner-table th,
+.dart-stats-modal .dart-winner-table td{padding:11px 10px}
+.dart-stats-modal-foot{display:flex;justify-content:flex-end;padding-top:6px}
+.dart-stats-modal-foot .dart-tb-btn{min-width:110px}
+.dart-stat-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--p-color,#d9a91c);margin-right:8px;vertical-align:middle;box-shadow:0 0 8px var(--p-color,#d9a91c)}
+.dart-stats-modal tr.is-current td{background:rgba(217,169,28,.10);color:#f0c060;font-weight:700}
+.dart-stats-modal tr.is-current td b{color:#f0c060}
+body.light .dart-stats-modal tr.is-current td{color:#8a5010;background:rgba(217,169,28,.12)}
+body.light .dart-stats-modal tr.is-current td b{color:#8a5010}
+.dart-game-stats-bottom summary{padding:6px 0;font-size:10px}
+.dart-game-stats-bottom .dart-winner-table-wrap{margin:6px 0 0;padding:6px 10px;max-width:100%}
+.dart-game-stats-bottom .dart-winner-table{font-size:12px}
+.dart-game-stats-bottom .dart-winner-table th,
+.dart-game-stats-bottom .dart-winner-table td{padding:6px 6px}
+.dart-game-stats-bottom .dart-stat-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--p-color,#d9a91c);margin-right:6px;vertical-align:middle;box-shadow:0 0 8px var(--p-color,#d9a91c)}
+.dart-game-stats-bottom tr.is-current td{background:rgba(217,169,28,.10);color:#f0c060;font-weight:700}
+.dart-game-stats-bottom tr.is-current td b{color:#f0c060}
+body.light .dart-game-stats-bottom tr.is-current td{color:#8a5010;background:rgba(217,169,28,.10)}
+body.light .dart-game-stats-bottom tr.is-current td b{color:#8a5010}
+/* Winner-tabel: alle spillere sammenlignet */
+.dart-winner-table-wrap{width:100%;max-width:760px;overflow-x:auto;background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:8px 12px;margin:12px 0 6px}
+.dart-winner-table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.dart-winner-table th{text-align:left;padding:10px 8px;font-size:10px;letter-spacing:1.5px;color:var(--t3);text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--bdr)}
+.dart-winner-table th:not(:first-child){text-align:center}
+.dart-winner-table td{padding:10px 8px;color:var(--t1);text-align:center;border-bottom:1px solid var(--bdr)}
+.dart-winner-table td:first-child{text-align:left}
+.dart-winner-table tr:last-child td{border-bottom:none}
+.dart-winner-table tr.is-winner td{background:rgba(217,169,28,.08);color:#f0c060;font-weight:700}
+.dart-winner-table tr.is-winner td b{color:#f0c060}
+body.light .dart-winner-table tr.is-winner td{color:#8a5010;background:rgba(217,169,28,.10)}
+body.light .dart-winner-table tr.is-winner td b{color:#8a5010}
+.dart-winner-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.dart-winner-btns .dart-start-btn{width:auto;min-width:200px}
+/* Responsive */
+@media(max-width:960px){
+  .dart-board-grid{grid-template-columns:repeat(4,1fr)}
+  .dart-num-n{font-size:22px}
+  .dart-turn-bar{grid-template-columns:1fr;gap:12px;text-align:center}
+  .dart-slot-val{font-size:18px}
+}
+/* Lys mode-justering */
+body.light .dart-pcard.active{box-shadow:0 0 24px rgba(180,130,30,.15),inset 0 0 0 1px rgba(180,130,30,.3)}
+body.light .dart-current-input{text-shadow:none}
+</style>
+</head>
+<body>
+
+<div id="dart-ov" class="dz-overlay" style="display:none;flex-direction:column"></div>
+
+<div class="modal-bg" id="modal-bg" style="display:none" onclick="closeModal(event)">
+  <div class="modal-box" id="modal-box" onclick="event.stopPropagation()"></div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ── Hjælpefunktioner (uddraget fra jukebox.html) ──
+const $ = id => document.getElementById(id);
+const qs = (sel, el=document) => el.querySelector(sel);
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toast(msg, dur=3000) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  $('toasts').appendChild(t);
+  setTimeout(() => t.remove(), dur);
+}
+
+function openModal(html, opts) {
+  const box = $('modal-box');
+  box.innerHTML = html;
+  if (opts && opts.wide) {
+    box.style.cssText = 'background:transparent;border:none;padding:0;width:auto;max-width:none;max-height:92vh;overflow-y:auto';
+  } else {
+    box.style.cssText = '';
+  }
+  $('modal-bg').style.display = 'flex';
+}
+
+function closeModal(e) {
+  if (e && e.target !== $('modal-bg')) return;
+  $('modal-bg').style.display = 'none';
+  $('modal-box').style.cssText = '';
+}
+window.closeModal = closeModal;
+
+// ── DART-LOGIK (uddraget fra jukebox.html) ──
+const _DART_STORAGE_KEY = '_dartState_v1';
+let _dartState = (() => {
+  try {
+    const s = JSON.parse(localStorage.getItem(_DART_STORAGE_KEY) || 'null');
+    if (!s) return null;
+    // Migrering fra gammelt format (pendingInput string → pendingDarts array)
+    if (!Array.isArray(s.pendingDarts)) s.pendingDarts = [];
+    if (typeof s.multiplier !== 'number') s.multiplier = 1;
+    if ('pendingInput' in s) delete s.pendingInput;
+    return s;
+  } catch { return null; }
+})();
+function _saveDart() {
+  try { localStorage.setItem(_DART_STORAGE_KEY, JSON.stringify(_dartState)); } catch {}
+}
+
+// Distinkte farver pr. spiller (op til 8)
+const _DART_PALETTE = [
+  { name: 'guld',     hex: '#e8b04a', light: '#a06410' },
+  { name: 'blå',      hex: '#5aa6f0', light: '#2256a8' },
+  { name: 'grøn',     hex: '#6ec96e', light: '#2e7a2e' },
+  { name: 'lilla',    hex: '#b876dc', light: '#5e2680' },
+  { name: 'orange',   hex: '#f0813c', light: '#a83a18' },
+  { name: 'cyan',     hex: '#5acccc', light: '#1e8888' },
+  { name: 'pink',     hex: '#e878b8', light: '#a02868' },
+  { name: 'rød',      hex: '#e85a5a', light: '#a82828' },
+];
+
+const _DART_THEMES = [
+  { id:'klassisk', label:'Classic',  desc:'B&O sober'         },
+  { id:'arena',    label:'Arena',     desc:'pro tournament'      },
+  { id:'vinter',   label:'Winter',    desc:'Nordic cool'      },
+  { id:'sport',    label:'Sport',     desc:'high contrast'       },
+  { id:'premier',  label:'Premier',   desc:'guld & sort'        },
+  { id:'klubhus',  label:'Clubhouse',   desc:'pub-tablet vibe'    },
+];
+
+function _newDartGame(startScore, players, doubleOut, existingTournament, theme, endRule, gameMode, cricketVariant) {
+  const mode = gameMode || 'x01';
+  return {
+    gameMode: mode,                                // 'x01' | 'cricket' | 'aroundclock'
+    cricketVariant: cricketVariant || 'standard',  // 'standard' | 'cutthroat' (kun ved cricket)
+    startScore,
+    doubleOut: !!doubleOut,
+    endRule: endRule || 'first',
+    theme: theme || 'klassisk',
+    players: players.map((name, i) => ({
+      name: name.trim() || 'Player',
+      colorIdx: i % _DART_PALETTE.length,
+      // X01: starter med startScore. Cricket: starter med 0 (samler point op). ATC: 0 score.
+      score: mode === 'x01' ? startScore : 0,
+      history: [],
+      darts: 0,
+      totalThrown: 0,
+      highest: 0,
+      finishedAt: null,
+      // Around the Clock: nuværende mål (1-20, så 25 = bullseye, så 26 = færdig)
+      atcTarget: mode === 'aroundclock' ? 1 : null,
+      // Cricket: marks på hvert mål (20,19,18,17,16,15,25=bull)
+      marks: mode === 'cricket' ? { 20:0, 19:0, 18:0, 17:0, 16:0, 15:0, 25:0 } : null,
+    })),
+    currentPlayer: 0,
+    winner: null,
+    turnsSinceWin: 0,
+    finishCount: 0,
+    pendingDarts: [],
+    multiplier: 1,
+    setupDone: true,
+    gameNumber: existingTournament ? (existingTournament._gameNumber || 1) + 1 : 1,
+    tournament: existingTournament || { _gameNumber: 1, scores: {} },
+  };
+}
+
+// Hjælper: backward-compat
+function _dartEndRule(s) {
+  if (!s) return 'first';
+  if (s.endRule) return s.endRule;
+  if (s.playRoundOut) return 'round';
+  return 'first';
+}
+function _dartGameMode(s) {
+  if (!s) return 'x01';
+  return s.gameMode || 'x01';  // gamle gemte spil = X01
+}
+
+function renderDart() {
+  const ov = $('dart-ov');
+  if (!ov) return;
+  if (!_dartState || !_dartState.setupDone) return _renderDartSetup(ov);
+  const s = _dartState;
+  const mode = _dartGameMode(s);
+  // Cricket er endnu ikke implementeret — vis placeholder
+  if (mode === 'cricket') return _renderDartCricketPlaceholder(ov);
+  // Around the Clock — egen game-renderer; vinder = nået målet
+  if (mode === 'aroundclock') {
+    if (s.winner != null) {
+      const rule = _dartEndRule(s);
+      // Round-out/finish opfører sig som X01: vis vinder først når alle har spillet/finishet
+      if (rule === 'round'  && (s.turnsSinceWin || 0) < s.players.length - 1) return _renderAtcGame(ov);
+      if (rule === 'finish' && !s.players.every(p => p.atcTarget > 25))         return _renderAtcGame(ov);
+      return _renderDartWinner(ov);
+    }
+    return _renderAtcGame(ov);
+  }
+  // X01 (default)
+  if (s.winner != null) {
+    const rule = _dartEndRule(s);
+    if (rule === 'round' && (s.turnsSinceWin || 0) < s.players.length - 1) {
+      return _renderDartGame(ov);
+    }
+    if (rule === 'finish' && !s.players.every(p => p.score === 0)) {
+      return _renderDartGame(ov);
+    }
+    return _renderDartWinner(ov);
+  }
+  _renderDartGame(ov);
+}
+
+// ── Ambient cover-baggrund toggle ──
+function toggleAmbient() {
+  const off = document.body.classList.toggle('no-ambient');
+  try { localStorage.setItem('jb_ambientOff', off ? '1' : '0'); } catch {}
+  toast(off ? 'Ambient background off' : 'Ambient background on');
+}
+window.toggleAmbient = toggleAmbient;
+// Indlæs gemt indstilling ved start
+(function _initAmbient() {
+  try {
+    if (localStorage.getItem('jb_ambientOff') === '1') {
+      document.body.classList.add('no-ambient');
+    }
+  } catch {}
+})();
+
+// Beregn detaljeret statistik for en spiller fra deres historik
+function _dartStats(p) {
+  const turns = p.history.length;
+  // Antal darts thrown — brug darts-arrayet hvis det findes, ellers 3 pr. tur
+  const dartsThrown = p.history.reduce((sum, h) => sum + (Array.isArray(h.darts) ? h.darts.length : 3), 0);
+  const total = p.totalThrown || 0;
+  const avg3 = turns ? Math.round(total / turns * 10) / 10 : 0;       // 3-dart avg
+  const avg1 = dartsThrown ? Math.round(total / dartsThrown * 100) / 100 : 0; // 1-dart avg
+  // First 9 average (gennemsnit af første 3 ture = første 9 pile, klassisk pro-stat)
+  const first3Turns = p.history.slice(0, 3).filter(h => !h.bust);
+  const first9Total = first3Turns.reduce((s, h) => s + h.throw, 0);
+  const first9Darts = first3Turns.reduce((s, h) => s + (Array.isArray(h.darts) ? h.darts.length : 3), 0);
+  const first9Avg = first9Darts ? Math.round(first9Total / first9Darts * 3 * 10) / 10 : 0;
+  // Antal 100+, 140+, 180
+  let n100 = 0, n140 = 0, n180 = 0;
+  for (const h of p.history) {
+    if (h.bust) continue;
+    if (h.throw >= 180) n180++;
+    else if (h.throw >= 140) n140++;
+    else if (h.throw >= 100) n100++;
+  }
+  const busts = p.history.filter(h => h.bust).length;
+  // Ringeste tur: laveste ikke-bust tur (vi springer 0-misses over så det ikke altid er 0)
+  let lowest = 0;
+  const realThrows = p.history.filter(h => !h.bust && h.throw > 0).map(h => h.throw);
+  if (realThrows.length) lowest = Math.min(...realThrows);
+  return { turns, dartsThrown, total, avg3, avg1, first9Avg, n100, n140, n180, busts, highest: p.highest, lowest };
+}
+
+// ── Checkout-forslag (klassisk dart-tabel) ─────────────────────────────────
+// Standard 3-pil finishes; opslag for 1-2 pile genereres dynamisk
+const _CHECKOUTS_3 = {
+  170:'T20 T20 Bull', 167:'T20 T19 Bull', 164:'T20 T18 Bull', 161:'T20 T17 Bull',
+  160:'T20 T20 D20', 158:'T20 T20 D19', 157:'T20 T19 D20', 156:'T20 T20 D18',
+  155:'T20 T19 D19', 154:'T20 T18 D20', 153:'T20 T19 D18', 152:'T20 T20 D16',
+  151:'T20 T17 D20', 150:'T20 T18 D18', 149:'T20 T19 D16', 148:'T20 T20 D14',
+  147:'T20 T17 D18', 146:'T20 T18 D16', 145:'T20 T15 D20', 144:'T20 T20 D12',
+  143:'T20 T17 D16', 142:'T20 T14 D20', 141:'T20 T19 D12', 140:'T20 T20 D10',
+  139:'T19 T14 D20', 138:'T20 T18 D12', 137:'T20 T19 D10', 136:'T20 T20 D8',
+  135:'T20 T15 D15', 134:'T20 T14 D16', 133:'T20 T19 D8',  132:'T20 T16 D12',
+  131:'T20 T13 D16', 130:'T20 T20 D5',  129:'T19 T16 D12', 128:'T18 T14 D16',
+  127:'T20 T17 D8',  126:'T19 T19 D6',  125:'T20 T19 D4',  124:'T20 T16 D8',
+  123:'T19 T16 D9',  122:'T18 T18 D7',  121:'T20 T11 D14', 120:'T20 S20 D20',
+  119:'T19 T12 D13', 118:'T20 S18 D20', 117:'T20 S17 D20', 116:'T20 S16 D20',
+  115:'T20 S15 D20', 114:'T20 S14 D20', 113:'T20 S13 D20', 112:'T20 S12 D20',
+  111:'T20 S11 D20', 110:'T20 S10 D20', 109:'T20 S9 D20',  108:'T20 S16 D16',
+  107:'T19 S10 D20', 106:'T20 S6 D20',  105:'T20 S5 D20',  104:'T18 S18 D16',
+  103:'T19 S10 D18', 102:'T20 S10 D16', 101:'T20 S9 D16',  100:'T20 D20',
+  99:'T19 S10 D16',  98:'T20 D19',      97:'T19 D20',      96:'T20 D18',
+  95:'T19 D19',      94:'T18 D20',      93:'T19 D18',      92:'T20 D16',
+  91:'T17 D20',      90:'T20 D15',      89:'T19 D16',      88:'T20 D14',
+  87:'T17 D18',      86:'T18 D16',      85:'T15 D20',      84:'T20 D12',
+  83:'T17 D16',      82:'T14 D20',      81:'T19 D12',      80:'T20 D10',
+  79:'T19 D11',      78:'T18 D12',      77:'T19 D10',      76:'T20 D8',
+  75:'T17 D12',      74:'T14 D16',      73:'T19 D8',       72:'T16 D12',
+  71:'T13 D16',      70:'T18 D8',       69:'T19 D6',       68:'T20 D4',
+  67:'T17 D8',       66:'T10 D18',      65:'T19 D4',       64:'T16 D8',
+  63:'T13 D12',      62:'T10 D16',      61:'T15 D8',       60:'S20 D20',
+  59:'S19 D20',      58:'S18 D20',      57:'S17 D20',      56:'S16 D20',
+  55:'S15 D20',      54:'S14 D20',      53:'S13 D20',      52:'S12 D20',
+  51:'S11 D20',      50:'Bull',         49:'S9 D20',       48:'S16 D16',
+  47:'S15 D16',      46:'S6 D20',       45:'S13 D16',      44:'S12 D16',
+  43:'S11 D16',      42:'S10 D16',      41:'S9 D16',       40:'D20',
+  39:'S7 D16',       38:'D19',          37:'S5 D16',       36:'D18',
+  35:'S3 D16',       34:'D17',          33:'S1 D16',       32:'D16',
+  31:'S15 D8',       30:'D15',          29:'S13 D8',       28:'D14',
+  27:'S11 D8',       26:'D13',          25:'S9 D8',        24:'D12',
+  23:'S7 D8',        22:'D11',          21:'S5 D8',        20:'D10',
+  19:'S3 D8',        18:'D9',           17:'S1 D8',        16:'D8',
+  15:'S7 D4',        14:'D7',           13:'S5 D4',        12:'D6',
+  11:'S3 D4',        10:'D5',            9:'S1 D4',         8:'D4',
+   7:'S3 D2',         6:'D3',            5:'S1 D2',         4:'D2',
+   3:'S1 D1',         2:'D1',
+};
+
+function _dartCheckout(score, dartsLeft) {
+  if (score < 2 || score > 170 || dartsLeft < 1) return null;
+  if (dartsLeft >= 3) return _CHECKOUTS_3[score] || _dartCheckout2(score) || _dartCheckout1(score);
+  if (dartsLeft === 2) return _dartCheckout2(score) || _dartCheckout1(score);
+  return _dartCheckout1(score);
+}
+function _dartCheckout1(score) {
+  // 1 dart finish — kun double eller bullseye
+  if (score === 50) return 'Bull';
+  if (score % 2 === 0 && score >= 2 && score <= 40) return `D${score/2}`;
+  return null;
+}
+function _dartCheckout2(score) {
+  // 2 dart finish — første pil hvadsomhelst, anden er double/bull
+  if (score < 4 || score > 110) return null;
+  // Prøv Bull som finish
+  if (score > 50) {
+    const r = score - 50;
+    if (r >= 1 && r <= 20) return `S${r} Bull`;
+    if (r % 3 === 0 && r/3 <= 20) return `T${r/3} Bull`;
+    if (r % 2 === 0 && r/2 <= 20) return `D${r/2} Bull`;
+  }
+  // Prøv D20 → D1 som finish, foretrukket høje
+  for (let d = 20; d >= 1; d--) {
+    const r = score - d * 2;
+    if (r < 0) continue;
+    if (r === 0) continue; // ren D-finish er 1-pil
+    if (r >= 1 && r <= 20) return `S${r} D${d}`;
+    if (r === 25) return `Bull D${d}`;
+    if (r % 3 === 0 && r/3 <= 20) return `T${r/3} D${d}`;
+    if (r % 2 === 0 && r/2 <= 20) return `D${r/2} D${d}`;
+  }
+  return null;
+}
+
+function _renderDartSetup(ov) {
+  // Standard: 2 spillere med tomme navne
+  const lastPlayers   = _dartState?.players?.map(p => p.name) || ['Dan', 'Player 2'];
+  const lastStart     = _dartState?.startScore || 501;
+  const lastDouble    = _dartState?.doubleOut || false;
+  const lastEndRule   = _dartEndRule(_dartState) || 'first';
+  const lastTheme     = _dartState?.theme || 'klassisk';
+  const lastMode      = _dartGameMode(_dartState);
+  const lastCricketV  = _dartState?.cricketVariant || 'standard';
+  ov.setAttribute('data-theme', lastTheme);
+  ov.innerHTML = `
+    <div class="dart-setup">
+      <div class="dart-setup-box">
+        <div class="dart-setup-lbl">🎯 Dart</div>
+        <h1 class="dart-setup-h">New Game</h1>
+        <div class="dart-setup-credit">Made by Dan Ruseng</div>
+        <div class="dart-setup-row">
+          <div class="dart-setup-label">Game type <button class="dart-rules-btn" onclick="_dartShowRules()" title="Read the rules for all games">?</button></div>
+          <div class="dart-setup-pills" id="dart-mode-pills">
+            <button class="dart-pill dart-mode-pill ${lastMode==='x01' ? 'on' : ''}" data-v="x01" onclick="_setDartMode('x01')">
+              <span class="dart-mode-emoji">🎯</span>
+              <span class="dart-mode-body"><b>X01</b><small>301 / 501 — count down to 0</small></span>
+            </button>
+            <button class="dart-pill dart-mode-pill ${lastMode==='cricket' ? 'on' : ''}" data-v="cricket" onclick="_setDartMode('cricket')">
+              <span class="dart-mode-emoji">🏏</span>
+              <span class="dart-mode-body"><b>Cricket</b><small>Close 20-15 + Bull with 3 marks</small></span>
+            </button>
+            <button class="dart-pill dart-mode-pill ${lastMode==='aroundclock' ? 'on' : ''}" data-v="aroundclock" onclick="_setDartMode('aroundclock')">
+              <span class="dart-mode-emoji">🕐</span>
+              <span class="dart-mode-body"><b>Around the Clock</b><small>Hit 1 → 20 → Bull in order</small></span>
+            </button>
+          </div>
+        </div>
+        <div class="dart-setup-row">
+          <div class="dart-setup-label">Theme</div>
+          <div class="dart-setup-pills dart-theme-pills" id="dart-theme-pills">
+            ${_DART_THEMES.map(t => `<button class="dart-pill dart-theme-pill dart-theme-pill-${t.id} ${t.id === lastTheme ? 'on' : ''}" data-v="${t.id}" onclick="_setDartTheme('${t.id}')">
+              <span class="dart-theme-swatch dart-theme-swatch-${t.id}"></span>
+              <span>${t.label}</span>
+            </button>`).join('')}
+          </div>
+        </div>
+        <div class="dart-setup-row dart-mode-only-x01" style="${lastMode!=='x01'?'display:none':''}">
+          <div class="dart-setup-label">Starting score</div>
+          <div class="dart-setup-pills" id="dart-start-pills">
+            ${[301, 501, 701].map(s => `<button class="dart-pill ${s === lastStart ? 'on' : ''}" data-v="${s}" onclick="_setDartStart(${s})">${s}</button>`).join('')}
+          </div>
+        </div>
+        <div class="dart-setup-row dart-mode-only-cricket" style="${lastMode!=='cricket'?'display:none':''}">
+          <div class="dart-setup-label">Cricket variant</div>
+          <div class="dart-setup-pills" id="dart-cricket-pills">
+            <button class="dart-pill ${lastCricketV==='standard'  ? 'on' : ''}" data-v="standard"  onclick="_setDartCricketV('standard')">⭐ Standard</button>
+            <button class="dart-pill ${lastCricketV==='cutthroat' ? 'on' : ''}" data-v="cutthroat" onclick="_setDartCricketV('cutthroat')">🗡️ Cut-Throat</button>
+          </div>
+        </div>
+        <div class="dart-setup-row">
+          <div class="dart-setup-label">Players</div>
+          <div class="dart-setup-players" id="dart-players-list">
+            ${lastPlayers.map((p, i) => `
+              <div class="dart-player-row">
+                <input class="dart-player-input" data-idx="${i}" value="${(p||'').replace(/"/g,'&quot;')}" placeholder="Name" maxlength="20">
+                ${lastPlayers.length > 2 ? `<button class="dart-player-remove" onclick="_removeDartPlayer(${i})" title="Remove">✕</button>` : ''}
+              </div>`).join('')}
+          </div>
+          <button class="dart-add-player" onclick="_addDartPlayer()">+ Add player</button>
+        </div>
+        <div class="dart-setup-row dart-setup-toggle dart-mode-only-x01" style="${lastMode!=='x01'?'display:none':''}">
+          <label class="dart-toggle">
+            <input type="checkbox" id="dart-double-out" ${lastDouble ? 'checked' : ''}>
+            <span>Double out (classic rule)</span>
+          </label>
+        </div>
+        <div class="dart-setup-row dart-mode-only-x01" style="${lastMode!=='x01'?'display:none':''}">
+          <div class="dart-setup-label">End rule</div>
+          <div class="dart-setup-pills" id="dart-endrule-pills">
+            <button class="dart-pill ${lastEndRule==='first'  ? 'on' : ''}" data-v="first"  onclick="_setDartEndRule('first')">🏁 First to 0 wins</button>
+            <button class="dart-pill ${lastEndRule==='round'  ? 'on' : ''}" data-v="round"  onclick="_setDartEndRule('round')">🏆 Finish the round</button>
+            <button class="dart-pill ${lastEndRule==='finish' ? 'on' : ''}" data-v="finish" onclick="_setDartEndRule('finish')">💯 Everyone must finish</button>
+          </div>
+        </div>
+        <button class="dart-start-btn" onclick="_startDartGame()">Start game →</button>
+      </div>
+    </div>`;
+}
+
+function _setDartStart(v) {
+  document.querySelectorAll('#dart-start-pills .dart-pill').forEach(p => {
+    p.classList.toggle('on', Number(p.dataset.v) === v);
+  });
+}
+function _setDartTheme(id) {
+  document.querySelectorAll('#dart-theme-pills .dart-pill').forEach(p => {
+    p.classList.toggle('on', p.dataset.v === id);
+  });
+  // Live preview af temaet
+  const ov = $('dart-ov');
+  if (ov) ov.setAttribute('data-theme', id);
+}
+function _setDartEndRule(id) {
+  document.querySelectorAll('#dart-endrule-pills .dart-pill').forEach(p => {
+    p.classList.toggle('on', p.dataset.v === id);
+  });
+}
+window._setDartEndRule = _setDartEndRule;
+
+function _setDartMode(id) {
+  document.querySelectorAll('#dart-mode-pills .dart-pill').forEach(p => {
+    p.classList.toggle('on', p.dataset.v === id);
+  });
+  // Vis/skjul felter der kun gælder for X01 hhv. Cricket
+  document.querySelectorAll('.dart-mode-only-x01').forEach(el => {
+    el.style.display = (id === 'x01') ? '' : 'none';
+  });
+  document.querySelectorAll('.dart-mode-only-cricket').forEach(el => {
+    el.style.display = (id === 'cricket') ? '' : 'none';
+  });
+}
+window._setDartMode = _setDartMode;
+
+function _setDartCricketV(id) {
+  document.querySelectorAll('#dart-cricket-pills .dart-pill').forEach(p => {
+    p.classList.toggle('on', p.dataset.v === id);
+  });
+}
+window._setDartCricketV = _setDartCricketV;
+
+// Detaljeret regler-popup for alle 3 spil-typer
+function _dartShowRules() {
+  const html = `
+    <div class="dart-rules-modal">
+      <div class="dart-rules-head">
+        <div class="dart-rules-title">🎯 Dart Rules</div>
+        <div class="dart-rules-sub">Choose the game that suits your group</div>
+      </div>
+      <div class="dart-rules-grid">
+
+        <div class="dart-rules-card">
+          <div class="dart-rules-card-head"><span class="dart-rules-emoji">🎯</span><h3>X01 — Classic</h3></div>
+          <div class="dart-rules-card-body">
+            <p><b>Start:</b> All players start on the same score — 301, 501 or 701.</p>
+            <p><b>Goal:</b> Be the first player to count down to exactly 0.</p>
+            <p><b>Turn:</b> Each player throws 3 darts per turn. The total is subtracted from the score.</p>
+            <p><b>Double out (optional):</b> The final dart must hit a double (or bullseye = double bull). If you go below 0 or leave 1, it is a <i>bust</i> and the turn does not count.</p>
+            <p><b>End rules:</b></p>
+            <ul>
+              <li>🏁 <b>First to 0</b> — the game stops immediately</li>
+              <li>🏆 <b>Finish the round</b> — everyone gets one final turn after a winner is found (decides 2nd/3rd place)</li>
+              <li>💯 <b>Everyone must finish</b> — the game continues until everyone has reached 0</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="dart-rules-card">
+          <div class="dart-rules-card-head"><span class="dart-rules-emoji">🏏</span><h3>Cricket</h3></div>
+          <div class="dart-rules-card-body">
+            <p><b>Target numbers:</b> Only 20, 19, 18, 17, 16, 15 and Bull (25/50) count.</p>
+            <p><b>Close a number:</b> Hit a number 3 times to close it. Single = 1 mark, double = 2 marks, triple = 3 marks. Bullseye (50) = 2 marks, outer bull (25) = 1 mark.</p>
+            <p><b>Standard Cricket:</b> Once YOU have closed a number and the others have not, you score <b>points</b> every time you hit it again (= number × multiplier).</p>
+            <p><b>Cut-Throat Cricket:</b> The opposite — you <b>give</b> points to the other players when you hit a closed number. Lowest score at the end wins.</p>
+            <p><b>Win:</b> The player who has closed all 7 targets <i>and</i> has the best score (lowest in Cut-Throat) wins.</p>
+          </div>
+        </div>
+
+        <div class="dart-rules-card">
+          <div class="dart-rules-card-head"><span class="dart-rules-emoji">🕐</span><h3>Around the Clock</h3></div>
+          <div class="dart-rules-card-body">
+            <p><b>Goal:</b> Be the first to hit 1, 2, 3 … 20 in order, then finish with a bullseye.</p>
+            <p><b>Turn:</b> Each player throws 3 darts per turn. Every time you hit the current target, you move on to the next one. You can therefore advance up to 3 targets in one turn.</p>
+            <p><b>Multipliers:</b> Singles, doubles and triples all count as one hit on the number (they do not move you ahead extra targets).</p>
+            <p><b>Win:</b> The first player to hit the bullseye after 20 wins. The others can continue depending on the end rule.</p>
+            <p><b>Tip:</b> Aim for the large segments — it does not matter whether it is a single or triple, as long as you hit the number.</p>
+          </div>
+        </div>
+
+      </div>
+      <div class="dart-rules-foot">
+        <button class="dart-tb-btn" onclick="closeModal()">Got it</button>
+      </div>
+    </div>`;
+  openModal(html, { wide: true });
+}
+window._dartShowRules = _dartShowRules;
+function _addDartPlayer() {
+  const list = $('dart-players-list');
+  const idx = list.children.length;
+  if (idx >= 8) { toast('Maximum 8 players'); return; }
+  const row = document.createElement('div');
+  row.className = 'dart-player-row';
+  row.innerHTML = `<input class="dart-player-input" data-idx="${idx}" value="" placeholder="Name" maxlength="20">
+    <button class="dart-player-remove" onclick="_removeDartPlayer(${idx})" title="Remove">✕</button>`;
+  list.appendChild(row);
+  row.querySelector('input').focus();
+}
+function _removeDartPlayer(idx) {
+  const list = $('dart-players-list');
+  if (list.children.length <= 2) { toast('Minimum 2 players'); return; }
+  list.children[idx].remove();
+  // Re-indexer
+  [...list.children].forEach((row, i) => {
+    row.querySelector('input').dataset.idx = i;
+    const btn = row.querySelector('.dart-player-remove');
+    if (btn) btn.setAttribute('onclick', `_removeDartPlayer(${i})`);
+  });
+}
+function _startDartGame() {
+  const mode      = document.querySelector('#dart-mode-pills .dart-pill.on')?.dataset.v || 'x01';
+  const cricketV  = document.querySelector('#dart-cricket-pills .dart-pill.on')?.dataset.v || 'standard';
+  const start     = Number(document.querySelector('#dart-start-pills .dart-pill.on')?.dataset.v || 501);
+  const doubleOut = !!$('dart-double-out')?.checked;
+  const endRule   = document.querySelector('#dart-endrule-pills .dart-pill.on')?.dataset.v || 'first';
+  const theme     = document.querySelector('#dart-theme-pills .dart-pill.on')?.dataset.v || 'klassisk';
+  const names     = [...document.querySelectorAll('.dart-player-input')].map(i => i.value);
+  _dartState = _newDartGame(start, names, doubleOut, null, theme, endRule, mode, cricketV);
+  _saveDart();
+  renderDart();
+}
+window._setDartStart = _setDartStart;
+window._setDartTheme = _setDartTheme;
+window._addDartPlayer = _addDartPlayer;
+window._removeDartPlayer = _removeDartPlayer;
+window._startDartGame = _startDartGame;
+
+// Find bedste og værste ENKELT-PIL (kast) på tværs af alle spillere.
+// "Kast" = én enkelt pil. "Runde" = 3-pil tur. Miss tæller ikke som værste.
+// Returnerer { best: { value, holders: [{name,colorIdx}] }, worst: ... } så TIED holdere ses.
+function _dartHighlightsDarts(s) {
+  if (!s || !s.players) return { best: null, worst: null };
+  let bestVal = -Infinity, worstVal = Infinity;
+  const allDarts = [];
+  s.players.forEach(p => {
+    (p.history || []).forEach(h => {
+      (h.darts || []).forEach(label => {
+        const d = _dartParseLabel(label);
+        if (!d) return; // miss
+        const value = d.num * d.mult;
+        if (value <= 0) return;
+        allDarts.push({ value, name: p.name, colorIdx: p.colorIdx });
+        if (value > bestVal)  bestVal  = value;
+        if (value < worstVal) worstVal = value;
+      });
+    });
+  });
+  if (!allDarts.length) return { best: null, worst: null };
+  // Saml alle UNIKKE spillere der har bedste/værste-værdien
+  const uniqHolders = (arr, value) => {
+    const seen = new Set();
+    return arr.filter(d => d.value === value).filter(d => {
+      if (seen.has(d.name)) return false;
+      seen.add(d.name); return true;
+    });
+  };
+  const best  = { value: bestVal,  holders: uniqHolders(allDarts, bestVal) };
+  let worst   = { value: worstVal, holders: uniqHolders(allDarts, worstVal) };
+  // Hvis bedste og værste er samme værdi (kun ét kast i spillet), skjul værste
+  if (best.value === worst.value) worst = null;
+  return { best, worst };
+}
+
+// Find bedste og værste RUNDE (3-pil tur) på tværs af alle spillere i det igangværende spil.
+// Bust tæller IKKE som værste — vi bruger laveste rigtige tur i stedet (mere fair).
+// Returnerer { best: { value, holders: [...] }, worst: ... } så TIED holdere ses.
+function _dartHighlights(s) {
+  if (!s || !s.players) return { best: null, worst: null };
+  let bestVal = -Infinity, worstVal = Infinity;
+  const allRounds = [];
+  s.players.forEach(p => {
+    (p.history || []).forEach(h => {
+      if (h.bust) return;
+      if (h.throw === 0) return;
+      allRounds.push({ value: h.throw, name: p.name, colorIdx: p.colorIdx });
+      if (h.throw > bestVal)  bestVal  = h.throw;
+      if (h.throw < worstVal) worstVal = h.throw;
+    });
+  });
+  if (!allRounds.length) return { best: null, worst: null };
+  const uniqHolders = (arr, value) => {
+    const seen = new Set();
+    return arr.filter(r => r.value === value).filter(r => {
+      if (seen.has(r.name)) return false;
+      seen.add(r.name); return true;
+    });
+  };
+  const best  = { value: bestVal,  holders: uniqHolders(allRounds, bestVal) };
+  let worst   = { value: worstVal, holders: uniqHolders(allRounds, worstVal) };
+  if (best.value === worst.value) worst = null;
+  return { best, worst };
+}
+
+// Deterministisk valg fra et array — så kommentator-teksten ikke skifter ved hvert klik,
+// men kun når spilleren / turen reelt har ændret sig.
+function _dartSeededPick(arr, seed) {
+  if (!arr.length) return '';
+  let h = 0;
+  const s = String(seed);
+  for (let i = 0; i < s.length; i++) h = ((h * 31) + s.charCodeAt(i)) | 0;
+  return arr[Math.abs(h) % arr.length];
+}
+
+// Parse en pil-label til {num, mult}. "20"→{20,1}, "D20"→{20,2}, "T20"→{20,3}, "Bull"→{25,1}, "Bullseye"→{25,2}, "—"→null.
+function _dartParseLabel(label) {
+  if (!label || label === '—') return null;
+  if (label === 'Bull')     return { num: 25, mult: 1 };
+  if (label === 'Bullseye') return { num: 25, mult: 2 };
+  const m = String(label).match(/^([DT]?)(\d+)$/);
+  if (!m) return null;
+  return { num: parseInt(m[2], 10), mult: m[1] === 'T' ? 3 : (m[1] === 'D' ? 2 : 1) };
+}
+
+// Snakkesalig "tv-kommentator" der observerer den aktive spiller.
+function _dartCommentary(s) {
+  if (!s || !s.players || !s.players.length) return '';
+  const cur = s.players[s.currentPlayer];
+  if (!cur) return '';
+  const name = cur.name;
+  const hist = cur.history || [];
+  const st = _dartStats(cur);
+
+  const sortedByScore = s.players.slice().sort((a, b) => a.score - b.score);
+  const isLeader = s.players.length > 1 && sortedByScore[0] === cur;
+  const isLast   = s.players.length > 1 && sortedByScore[sortedByScore.length - 1] === cur;
+  const scoreGap = (s.players.length > 1) ? (cur.score - sortedByScore[0].score) : 0;
+
+  const goodThrows = hist.filter(h => !h.bust).map(h => h.throw);
+  const avg = goodThrows.length ? goodThrows.reduce((a,b)=>a+b,0)/goodThrows.length : 0;
+  const last = hist.length ? hist[hist.length - 1] : null;
+
+  let bustStreak = 0;
+  for (let i = hist.length - 1; i >= 0; i--) {
+    if (hist[i].bust) bustStreak++;
+    else break;
+  }
+
+  const lastMisses = last ? (last.darts || []).filter(d => d === '—' || d === '0').length : 0;
+  const numHits = {};
+  let totalDarts = 0;
+  hist.forEach(h => {
+    (h.darts || []).forEach(label => {
+      totalDarts++;
+      const d = _dartParseLabel(label);
+      if (!d) { numHits[0] = (numHits[0] || 0) + 1; return; }
+      numHits[d.num] = (numHits[d.num] || 0) + 1;
+    });
+  });
+  const topHits = Object.entries(numHits).filter(([n]) => +n > 0).sort((a,b)=>b[1]-a[1]);
+  const lowHits = topHits.filter(([n]) => +n >= 1 && +n <= 5);
+  const mostLow = lowHits[0];
+  const totalMisses = numHits[0] || 0;
+  const remarks = [];
+
+  if (!hist.length) {
+    remarks.push(
+      `${name}'s turn — a fresh start. Let's see what he's got.`,
+      `${name}'s turn — the first throw always feels important.`,
+      `${name}'s turn — darts warm, hand ready.`,
+      `${name}'s turn — no darts thrown yet. You could cut the tension with a knife.`,
+      `${name}'s turn — here we go. Good luck, he may need it.`,
+      `${name}'s turn — stepping up to the line with a full scoreboard ahead of him.`,
+      `${name}'s turn — future world champion on paper. Let's see.`,
+      `${name}'s turn — aim, throw, and hope for the best.`,
+      `${name}'s turn — the commentary box is quiet. Nobody knows what's coming.`
+    );
+  } else {
+    if (last.bust) {
+      remarks.push(
+        `${name}'s turn — bust last time. Time to focus.`,
+        `${name}'s turn — after a bust, the only way is up.`,
+        `${name}'s turn — bust on the last visit, zero points. That hurts.`,
+        `${name}'s turn — a bust is a bust. Forget it and move on.`,
+        `${name}'s turn — the last visit went up in smoke. New attempt.`,
+        `${name}'s turn — he busted. Probably not the first time, probably not the last.`,
+        `${name}'s turn — subtraction got the better of him. Classic amateur move.`
+      );
+      if (bustStreak >= 2) remarks.push(
+        `${name}'s turn — ${bustStreak} busts in a row. This is not his day.`,
+        `${name}'s turn — ${bustStreak} straight busts. Is he okay?`,
+        `${name}'s turn — ${bustStreak} busts back-to-back. Statistically impressive, just not in a good way.`,
+        `${name}'s turn — he's busting so often it's becoming an art form.`
+      );
+    } else if (last.throw === 180) {
+      remarks.push(
+        `${name}'s turn — 180 last visit! Can he follow it up?`,
+        `${name}'s turn — after a perfect visit, expectations are high.`,
+        `${name}'s turn — 180 last time. You don't see that every day.`,
+        `${name}'s turn — 180! He's in the zone now.`,
+        `${name}'s turn — after a maximum, there isn't much to say. Lovely darts.`,
+        `${name}'s turn — 180. Someone get him a PDC application form.`,
+        `${name}'s turn — perfection last time. Now comes the hard part: doing it again.`
+      );
+    } else if (last.throw >= 140) {
+      remarks.push(
+        `${name}'s turn — ${last.throw} last visit. He's hot now.`,
+        `${name}'s turn — a big ton-plus last time. He's in a good position.`,
+        `${name}'s turn — ${last.throw} last visit. Keep that up and this will be over soon.`,
+        `${name}'s turn — ${last.throw} last time. Easy work.`,
+        `${name}'s turn — ${last.throw}! The darts are going exactly where they should.`
+      );
+    } else if (last.throw >= 100) {
+      remarks.push(
+        `${name}'s turn — ${last.throw} last visit. Solid darts.`,
+        `${name}'s turn — over a hundred again. He's found the rhythm.`,
+        `${name}'s turn — ${last.throw} points. Nice work.`,
+        `${name}'s turn — a ton in the bank. Breathe, ${name}.`,
+        `${name}'s turn — ${last.throw} last time. He's playing with confidence.`
+      );
+    } else if (last.throw < 15 && goodThrows.length > 1) {
+      remarks.push(
+        `${name}'s turn — only ${last.throw} last time. That was rough.`,
+        `${name}'s turn — ${last.throw} points last visit. The darts must be heavy today.`,
+        `${name}'s turn — a miserable ${last.throw}. Did the darts get lost on the way to the board?`,
+        `${name}'s turn — ${last.throw} points. Hard to do much worse, but he might manage it.`,
+        `${name}'s turn — after ${last.throw}, he seriously needs to step it up.`,
+        `${name}'s turn — ${last.throw} last time. Maybe try with the eyes open?`,
+        `${name}'s turn — ${last.throw}. Hard to believe that was intentional.`,
+        `${name}'s turn — ${last.throw} points. He may want to sit down and think about that.`
+      );
+    } else if (last.throw < 30 && goodThrows.length > 1 && last.throw < avg * 0.6) {
+      remarks.push(
+        `${name}'s turn — only ${last.throw} last visit. Surely he can do better.`,
+        `${name}'s turn — a poor ${last.throw} last time. Time to find another gear.`,
+        `${name}'s turn — only ${last.throw} last visit. Not exactly impressive.`,
+        `${name}'s turn — ${last.throw} points last time. He can do better than that.`,
+        `${name}'s turn — ${last.throw}. Phil Taylor is crying somewhere.`,
+        `${name}'s turn — ${last.throw} last time. Ambition appears to be on a break.`
+      );
+    } else if (last.throw >= 60) {
+      remarks.push(
+        `${name}'s turn — ${last.throw} last time. Nice score.`,
+        `${name}'s turn — good visit with ${last.throw}. Keep it going.`,
+        `${name}'s turn — ${last.throw} points in the bank. That works.`,
+        `${name}'s turn — ${last.throw} last visit. Steady and respectable.`
+      );
+    } else {
+      remarks.push(
+        `${name}'s turn — ${last.throw} last time. Fine, but there's room for more.`,
+        `${name}'s turn — ${last.throw} last visit. Time to turn up the pressure.`,
+        `${name}'s turn — ${last.throw} points. We'll take it.`,
+        `${name}'s turn — ${last.throw} last time. Average darts in the finest sense.`
+      );
+    }
+
+    if (lastMisses === 3) remarks.push(
+      `${name}'s turn — three misses last time. Has someone moved the board?`,
+      `${name}'s turn — 0 points from 3 darts. An achievement in its own way.`,
+      `${name}'s turn — all three darts missed. Back to the practice board.`,
+      `${name}'s turn — three misses. Maybe opening the eyes would help.`
+    );
+    else if (lastMisses === 2) remarks.push(
+      `${name}'s turn — two misses last time. The darts are running away from him.`,
+      `${name}'s turn — 2 out of 3 darts missed. This is getting ugly.`,
+      `${name}'s turn — two misses. Maybe clean the glasses.`
+    );
+    if (totalMisses >= 5) remarks.push(
+      `${name}'s turn — ${totalMisses} misses in this game. That board has something against him.`,
+      `${name}'s turn — ${totalMisses} misses so far. Eyes closed might give the same result.`,
+      `${name}'s turn — ${totalMisses} misses. The wall is starting to feel nervous.`
+    );
+
+    if (mostLow && mostLow[1] >= 3) {
+      const num = mostLow[0], count = mostLow[1];
+      if (num === '1' || num === '5') remarks.push(
+        `${name}'s turn — aiming at 20 but he's found ${count} ${num}s so far. The darts keep drifting.`,
+        `${name}'s turn — he's trying for 20, but the ${num} keeps calling. ${count} hits there.`,
+        `${name}'s turn — ${count} visits to the ${num}. Probably not the plan.`,
+        `${name}'s turn — he's bombarding the ${num}. Shame it isn't the 20.`
+      );
+      else if (num === '3') remarks.push(
+        `${name}'s turn — ${count} hits on the 3. Was he aiming for 19 or 17? Either way, it escaped.`,
+        `${name}'s turn — ${count} threes on the board. The next dart needs to move away from the bottom.`,
+        `${name}'s turn — he has a special relationship with the 3. ${count} hits there.`
+      );
+      else if (num === '2') remarks.push(
+        `${name}'s turn — ${count} twos so far. Looks like he was aiming for 17.`,
+        `${name}'s turn — he's hit the 2 ${count} times. The 17 is keeping its distance.`,
+        `${name}'s turn — ${count} trips down to the 2. Not many points down there.`
+      );
+      else if (num === '4') remarks.push(
+        `${name}'s turn — ${count} fours. He may have been looking for 18 a few times.`,
+        `${name}'s turn — the 4 is his best friend. That's not a good sign.`
+      );
+    }
+
+    if (topHits.length && topHits[0][1] >= 4 && +topHits[0][0] >= 15) {
+      const [num, count] = topHits[0];
+      remarks.push(
+        `${name}'s turn — he loves the ${num}. ${count} hits there so far.`,
+        `${name}'s turn — the ${num} has been hit ${count} times. Looks like he has a favourite.`
+      );
+    }
+
+    if (isLast) {
+      remarks.push(
+        `${name}'s turn — bottom of the table with ${cur.score} points still to go.`,
+        `${name}'s turn — last place. Time to turn this around.`,
+        `${name}'s turn — bringing up the rear. Hope and despair are taking turns.`,
+        `${name}'s turn — things are getting difficult: last place with ${cur.score} remaining.`,
+        `${name}'s turn — not exactly world champion form tonight.`,
+        `${name}'s turn — the back-marker picks up the darts. Can he rescue this?`,
+        `${name}'s turn — ${cur.score} left. There's some work to do.`
+      );
+      if (scoreGap > 150) remarks.push(
+        `${name}'s turn — ${scoreGap} behind. This is barely a contest anymore.`,
+        `${name}'s turn — ${scoreGap} points behind the leader. He might as well grab a beer.`,
+        `${name}'s turn — the gap to the top is ${scoreGap}. This is going to be difficult.`,
+        `${name}'s turn — ${scoreGap} behind. Maybe book the taxi home now.`
+      );
+      else if (scoreGap > 80) remarks.push(
+        `${name}'s turn — ${scoreGap} behind. He needs a miracle now.`,
+        `${name}'s turn — ${scoreGap} behind the leader. Take a moment, ${name}.`
+      );
+    }
+
+    if (isLeader) remarks.push(
+      `${name}'s turn — leads the field with only ${cur.score} left. He can smell victory.`,
+      `${name}'s turn — the leader picks up the darts. Just don't ruin it now.`,
+      `${name}'s turn — out in front, but nothing is over until the double lands.`,
+      `${name}'s turn — he's difficult to catch right now.`,
+      `${name}'s turn — he's leading, but there are still darts to throw.`,
+      `${name}'s turn — heading in the right direction. Just hold the line.`
+    );
+
+    if (cur.score <= 50 && cur.score > 1) remarks.push(
+      `${name}'s turn — only ${cur.score} from victory. Can he keep the hand steady?`,
+      `${name}'s turn — so close! Just ${cur.score} left.`,
+      `${name}'s turn — checkout territory! ${cur.score} for the win.`,
+      `${name}'s turn — he can smell victory. The question is whether the nerves hold.`,
+      `${name}'s turn — ${cur.score} left. Find the double and it's over.`
+    );
+
+    if (cur.score === 1 && s.doubleOut) remarks.push(
+      `${name}'s turn — stuck on 1. This is a living nightmare.`,
+      `${name}'s turn — score 1 with double out. That's a horrible place to be.`,
+      `${name}'s turn — sitting on 1. The checkout maths has not been kind.`
+    );
+
+    if (st.busts >= 4) remarks.push(
+      `${name}'s turn — ${st.busts} busts already. Mental arithmetic may not be his strongest subject.`,
+      `${name}'s turn — ${st.busts} busts. Somebody bring in a calculator.`,
+      `${name}'s turn — ${st.busts} busts so far. He may need assistance.`
+    );
+    else if (st.busts >= 2) remarks.push(
+      `${name}'s turn — ${st.busts} busts already. We're talking basic subtraction here.`,
+      `${name}'s turn — two busts on the board. Check the maths before throwing.`
+    );
+
+    if (st.n180 >= 2) remarks.push(
+      `${name}'s turn — ${st.n180} maximums already. Is that Phil Taylor in disguise?`,
+      `${name}'s turn — with ${st.n180} 180s in the bag, he's dangerous.`,
+      `${name}'s turn — ${st.n180} maximums. He's setting the dartboard on fire.`
+    );
+    else if (st.n180 === 1) remarks.push(
+      `${name}'s turn — he's already hit one 180. Can he do it again?`,
+      `${name}'s turn — one maximum in the bank. He knows it's possible.`
+    );
+
+    if (parseFloat(st.avg3) > 70 && hist.length >= 3) remarks.push(
+      `${name}'s turn — a 3-dart average of ${st.avg3}. He's in form.`,
+      `${name}'s turn — with a ${st.avg3} average, he's hard to stop.`,
+      `${name}'s turn — ${st.avg3} average. That's serious darts.`
+    );
+    if (parseFloat(st.first9Avg) > 50 && hist.length <= 6 && hist.length >= 2) remarks.push(
+      `${name}'s turn — first 9 average of ${st.first9Avg}. Promising start.`,
+      `${name}'s turn — he opened with ${st.first9Avg} in the first 9. Solid.`
+    );
+
+    if (isLast && hist.length >= 3 && parseFloat(st.avg3) < 30) remarks.push(
+      `${name}'s turn — ${st.avg3} average. Even the scoreboard looks disappointed.`,
+      `${name}'s turn — ${st.avg3} average. Maybe it's time for a different game.`,
+      `${name}'s turn — this doesn't look like darts, it looks like an attack on the wall.`,
+      `${name}'s turn — the darts are fleeing like rats from a sinking ship.`,
+      `${name}'s turn — is this his first time holding a dart?`,
+      `${name}'s turn — bowling might be worth a try.`,
+      `${name}'s turn — ${st.avg3} average. This is becoming difficult to watch.`,
+      `${name}'s turn — his 3-dart average might be lower than his age. That's a problem.`
+    );
+
+    if (st.highest >= 100 && hist.length >= 3) remarks.push(
+      `${name}'s turn — his best visit is ${st.highest}. A very respectable day at the office.`
+    );
+  }
+
+  if (!remarks.length) remarks.push(`${name}'s turn — ${cur.score} points remaining.`);
+  const seed = `${s.gameNumber || 1}-${s.currentPlayer}-${hist.length}-${(last && last.bust) ? 'b' : 'n'}-${totalDarts}`;
+  return _dartSeededPick(remarks, seed);
+}
+
+// ═══ AROUND THE CLOCK — egen game-renderer ═══
+// Progression: 1, 2, 3, ..., 19, 20, 25 (bullseye), 26 (færdig)
+// 21 mål i alt (1-20 + bullseye)
+function _atcNextTarget(t) {
+  if (t === 20) return 25;        // efter 20 → bullseye (21 findes ikke på brættet)
+  if (t === 25) return 26;        // efter bullseye → færdig
+  if (t >= 26)  return 26;
+  return t + 1;
+}
+function _atcProgress(t) {
+  let done;
+  if (t >= 26) done = 21;
+  else if (t === 25) done = 20;
+  else done = t - 1;
+  return Math.round((done / 21) * 100);
+}
+function _atcTilMaal(t) {
+  if (t >= 26) return 0;
+  if (t === 25) return 1;
+  return 22 - t;  // fx t=1 → 21, t=20 → 2 (20 + bullseye)
+}
+
+function _renderAtcGame(ov) {
+  const s = _dartState;
+  ov.setAttribute('data-theme', s.theme || 'klassisk');
+  // Self-heal #1: tidligere bug satte atcTarget=21 efter at have ramt 20. Rebound til 25.
+  let healed = false;
+  s.players.forEach(p => {
+    if (p.atcTarget === 21 || p.atcTarget === 22 || p.atcTarget === 23 || p.atcTarget === 24) {
+      p.atcTarget = 25;
+      healed = true;
+    }
+  });
+  // Self-heal #2: hvis ALLE er færdige men spillet ikke er afsluttet, afslut nu.
+  // Fanger fastlåste spil fra tidligere bug i 'round' mode.
+  if (s.players.every(p => p.atcTarget > 25) && s.players.length > 0) {
+    // Sørg for at alle har finishedAt sat (ranger bagudkompatibelt)
+    let nextRank = (s.finishCount || 0);
+    s.players.forEach(p => {
+      if (p.atcTarget > 25 && p.finishedAt == null) {
+        nextRank += 1;
+        p.finishedAt = nextRank;
+      }
+    });
+    s.finishCount = nextRank;
+    if (s.winner == null) {
+      // Find første der finisher
+      const firstFinisher = s.players.findIndex(p => p.finishedAt === 1);
+      if (firstFinisher >= 0) s.winner = firstFinisher;
+    }
+    _awardTournamentPoints();
+    s.pendingDarts = []; s.multiplier = 1;
+    _saveDart();
+    return _renderDartWinner(ov);
+  }
+  if (healed) { _saveDart(); }
+  const player = s.players[s.currentPlayer];
+  const targetLabel = (t) => (t >= 26 ? '✓' : (t === 25 ? 'BULL' : String(t)));
+  const progressPct = (t) => _atcProgress(t);
+
+  ov.innerHTML = `
+    <div class="dart-game">
+      <div class="dart-topbar">
+        <div class="dart-topbar-left">
+          <div class="dart-game-lbl">🕐 Around the Clock · Game ${s.gameNumber || 1}</div>
+          ${s.winner != null ? `<div class="dart-roundout-banner">🏁 ${esc(s.players[s.winner].name)} hit the target!</div>` : ''}
+        </div>
+        <div class="dart-topbar-btns">
+          <button class="dart-tb-btn" onclick="_dartShowStats()" title="Show full statistics">📊 Statistics</button>
+          <button class="dart-tb-btn" onclick="_dartUndo()">↶ Turn</button>
+          <button class="dart-tb-btn" onclick="_dartNewGame()">New game</button>
+        </div>
+      </div>
+
+      <div class="dart-players">
+        ${s.players.map((p, i) => {
+          const c = _DART_PALETTE[p.colorIdx || 0];
+          const isActive = i === s.currentPlayer;
+          const done = p.atcTarget > 25;
+          return `<div class="dart-pcard ${isActive ? 'active' : ''} ${done ? 'won' : ''}" style="--p-color:${c.hex};--p-color-light:${c.light}">
+            <div class="dart-pcard-left">
+              <div class="dart-pname"><span class="dart-pdot"></span>${esc(p.name)}</div>
+              <div class="dart-pscore">${done ? '✓' : targetLabel(p.atcTarget)}</div>
+              <div class="dart-pcard-turnlbl">${done ? '🏆 FINISHED' : (isActive ? 'NEXT TARGET' : 'TARGET')}</div>
+            </div>
+            <div class="dart-pcard-right">
+              <div class="dart-pcard-stat">
+                <span class="dart-pcard-stat-ico">📊</span>
+                <div class="dart-pcard-stat-body">
+                  <div class="dart-pcard-stat-lbl">Progress</div>
+                  <div class="dart-pcard-stat-val">${progressPct(p.atcTarget)}%</div>
+                </div>
+              </div>
+              <div class="dart-pcard-stat">
+                <span class="dart-pcard-stat-ico">🎯</span>
+                <div class="dart-pcard-stat-body">
+                  <div class="dart-pcard-stat-lbl">Darts thrown</div>
+                  <div class="dart-pcard-stat-val">${p.history.reduce((s,h)=>s+(h.darts?.length||0),0)}</div>
+                </div>
+              </div>
+              <div class="dart-pcard-stat">
+                <span class="dart-pcard-stat-ico">⏳</span>
+                <div class="dart-pcard-stat-body">
+                  <div class="dart-pcard-stat-lbl">To finish</div>
+                  <div class="dart-pcard-stat-val">${_atcTilMaal(p.atcTarget)}</div>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <div class="dart-turn-bar">
+        <div class="dart-turn-name">${esc(player.name)}'s turn — hit <b style="color:#f0c060">${targetLabel(player.atcTarget)}</b></div>
+        <div class="dart-darts">
+          ${[0,1,2].map(i => {
+            const d = s.pendingDarts[i];
+            return `<div class="dart-slot ${d ? 'filled' : ''} ${i === s.pendingDarts.length && s.pendingDarts.length < 3 ? 'next' : ''}">
+              <div class="dart-slot-lbl">Dart ${i+1}</div>
+              <div class="dart-slot-val">${d ? (d.hit ? '✓ ' + d.label : '✗ ' + d.label) : '—'}</div>
+            </div>`;
+          }).join('')}
+        </div>
+        <button class="dart-finish-btn ${s.pendingDarts.length > 0 ? 'on' : ''}" onclick="_dartAtcFinishTurn()" ${s.pendingDarts.length === 0 ? 'disabled' : ''}>Finish →</button>
+      </div>
+
+      <div class="dart-mult-row">
+        <button class="dart-mult ${s.multiplier === 1 ? 'on' : ''}" onclick="_dartSetMult(1)">Single ×1</button>
+        <button class="dart-mult ${s.multiplier === 2 ? 'on' : ''}" onclick="_dartSetMult(2)">Double ×2</button>
+        <button class="dart-mult ${s.multiplier === 3 ? 'on' : ''}" onclick="_dartSetMult(3)">Triple ×3</button>
+      </div>
+
+      <div class="dart-board-grid">
+        ${Array.from({length:20}, (_,i) => i+1).map(n => {
+          const m = s.multiplier;
+          const lbl = m === 1 ? `${n}` : (m === 2 ? `D${n}` : `T${n}`);
+          const isTarget = (player.atcTarget === n);
+          return `<button class="dart-num ${isTarget ? 'is-atc-target' : ''}" onclick="_dartAtcHit(${n})">
+            <div class="dart-num-n">${n}</div>
+            ${m > 1 ? `<div class="dart-num-v">${lbl}</div>` : ''}
+          </button>`;
+        }).join('')}
+        <button class="dart-num dart-num-bull ${player.atcTarget === 25 ? 'is-atc-target' : ''}" onclick="_dartAtcHitBull(25)">
+          <div class="dart-num-n">25</div><div class="dart-num-v">BULL</div>
+        </button>
+        <button class="dart-num dart-num-bull dart-num-bullseye ${player.atcTarget === 25 ? 'is-atc-target' : ''}" onclick="_dartAtcHitBull(50)">
+          <div class="dart-num-n">50</div><div class="dart-num-v">BULLSEYE</div>
+        </button>
+        <button class="dart-num dart-num-miss" onclick="_dartAtcHit(0)">
+          <div class="dart-num-n">0</div><div class="dart-num-v">MISS</div>
+        </button>
+        <button class="dart-num dart-num-undo" onclick="_dartUndoDart()">
+          <div class="dart-num-n">↺</div><div class="dart-num-v">Undo dart</div>
+        </button>
+      </div>
+    </div>`;
+}
+
+function _dartAtcHit(n) {
+  if (!_dartState) return;
+  const s = _dartState;
+  if (s.pendingDarts.length >= 3) { toast('Already 3 darts — press Finish'); return; }
+  const m = s.multiplier;
+  const player = s.players[s.currentPlayer];
+  let label;
+  if (n === 0) label = '—';
+  else if (m === 2) label = `D${n}`;
+  else if (m === 3) label = `T${n}`;
+  else label = `${n}`;
+  // Hit kun hvis nummer matcher aktuelt mål (single/double/triple alle tæller som ét hit)
+  const hit = (n > 0) && (n === player.atcTarget);
+  if (hit) player.atcTarget = _atcNextTarget(player.atcTarget);
+  s.pendingDarts.push({ value: hit ? 1 : 0, label, hit, num: n });
+  s.multiplier = 1;
+  _saveDart();
+  renderDart();
+}
+function _dartAtcHitBull(v) {
+  if (!_dartState) return;
+  const s = _dartState;
+  if (s.pendingDarts.length >= 3) { toast('Already 3 darts — press Finish'); return; }
+  const player = s.players[s.currentPlayer];
+  const label = v === 50 ? 'Bullseye' : 'Bull';
+  // Bullseye/Bull tæller kun hvis aktuelt mål er bullseye (target = 25)
+  const hit = (player.atcTarget === 25);
+  if (hit) player.atcTarget = _atcNextTarget(player.atcTarget);
+  s.pendingDarts.push({ value: hit ? 1 : 0, label, hit, num: 25 });
+  s.multiplier = 1;
+  _saveDart();
+  renderDart();
+}
+function _dartAtcFinishTurn() {
+  if (!_dartState) return;
+  const s = _dartState;
+  if (!s.pendingDarts.length) { toast('Throw at least one dart first'); return; }
+  const player = s.players[s.currentPlayer];
+  const dartLabels = s.pendingDarts.map(d => d.label);
+  const hits = s.pendingDarts.filter(d => d.hit).length;
+  player.history.push({ throw: hits, darts: dartLabels, score: player.atcTarget, bust: false });
+  player.totalThrown += hits;
+  if (hits > player.highest) player.highest = hits;
+
+  const rule = _dartEndRule(s);
+  const justFinished = (player.atcTarget > 25 && player.finishedAt == null);
+
+  if (justFinished) {
+    s.finishCount = (s.finishCount || 0) + 1;
+    player.finishedAt = s.finishCount;
+    if (s.winner == null) {
+      // Første finisher = vinder, start round-out tæller
+      s.winner = s.currentPlayer;
+      s.turnsSinceWin = 0;
+    } else if (rule === 'round') {
+      // En senere finisher — tæl turen med (i stedet for at nulstille)
+      s.turnsSinceWin = (s.turnsSinceWin || 0) + 1;
+    }
+    if (rule === 'first') {
+      _awardTournamentPoints();
+      s.pendingDarts = []; s.multiplier = 1;
+      _saveDart(); renderDart();
+      return;
+    }
+  } else if (s.winner != null && rule === 'round') {
+    s.turnsSinceWin = (s.turnsSinceWin || 0) + 1;
+  }
+
+  // UNIVERSAL slut-tjek: hvis alle er færdige, afslut spillet (gælder alle modes
+  // efter en vinder er fundet — beskytter mod stuck-spil i 'round' og 'finish').
+  if (s.players.every(p => p.atcTarget > 25)) {
+    _awardTournamentPoints();
+    s.pendingDarts = []; s.multiplier = 1;
+    _saveDart(); renderDart();
+    return;
+  }
+  // 'round' specifik: alle har spillet deres sidste tur
+  if (rule === 'round' && s.winner != null && (s.turnsSinceWin || 0) >= s.players.length - 1) {
+    _awardTournamentPoints();
+    s.pendingDarts = []; s.multiplier = 1;
+    _saveDart(); renderDart();
+    return;
+  }
+
+  // Advance til næste spiller, spring de færdige over (round/finish)
+  s.currentPlayer = (s.currentPlayer + 1) % s.players.length;
+  if (rule === 'round' || rule === 'finish') {
+    let safety = 0;
+    while (s.players[s.currentPlayer].atcTarget > 25 && safety < s.players.length) {
+      s.currentPlayer = (s.currentPlayer + 1) % s.players.length;
+      safety++;
+    }
+  }
+  s.pendingDarts = []; s.multiplier = 1;
+  _saveDart(); renderDart();
+}
+window._dartAtcHit = _dartAtcHit;
+window._dartAtcHitBull = _dartAtcHitBull;
+window._dartAtcFinishTurn = _dartAtcFinishTurn;
+
+// Cricket placeholder
+function _renderDartCricketPlaceholder(ov) {
+  const s = _dartState;
+  ov.setAttribute('data-theme', s.theme || 'klassisk');
+  ov.innerHTML = `
+    <div class="dart-game" style="align-items:center;justify-content:center;padding:40px 20px">
+      <div style="max-width:520px;text-align:center;padding:40px;background:var(--card);border:1px solid var(--bdr);border-radius:18px">
+        <div style="font-size:64px;margin-bottom:18px">🏏</div>
+        <h1 style="margin:0 0 12px;font-size:28px;color:var(--t1)">Cricket — coming soon</h1>
+        <p style="color:var(--t2);font-size:14px;line-height:1.6;margin:0 0 20px">
+          Cricket mode is not finished yet. Variant: <b>${s.cricketVariant === 'cutthroat' ? 'Cut-Throat' : 'Standard'}</b>.
+          Choose X01 or Around the Clock for now. Cricket will be ready in a future update.
+        </p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="dart-start-btn" style="width:auto" onclick="_dartNewGame()">Choose another game →</button>
+          <button class="dart-tb-btn" onclick="_dartShowRules()">Read the Cricket rules</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function _renderDartGame(ov) {
+  const s = _dartState;
+  ov.setAttribute('data-theme', s.theme || 'klassisk');
+  const player = s.players[s.currentPlayer];
+  const pendingSum = (s.pendingDarts || []).reduce((a, d) => a + d.value, 0);
+  const previewScore = player.score - pendingSum;
+
+  // Mini-leaderboard data (kun hvis turnering har point)
+  const tScores = (s.tournament && s.tournament.scores) || {};
+  const standings = Object.entries(tScores)
+    .map(([name, d]) => ({ name, points: d.points, wins: d.wins, colorIdx: d.colorIdx }))
+    .sort((a, b) => b.points - a.points);
+  const showStandings = standings.length > 0;
+
+  ov.innerHTML = `
+    <div class="dart-game">
+      <div class="dart-topbar">
+        <div class="dart-topbar-left">
+          <div class="dart-game-lbl">🎯 Game ${s.gameNumber || 1} · ${s.startScore}${s.doubleOut ? ' · Double out' : ''}${(() => {
+            const r = _dartEndRule(s);
+            if (r === 'round')  return ' · Finish the round';
+            if (r === 'finish') return ' · Everyone must finish';
+            return '';
+          })()}</div>
+          ${(s.winner != null) ? (() => {
+            const rule = _dartEndRule(s);
+            const winnerName = s.players[s.winner]?.name || '';
+            if (rule === 'round') {
+              const remaining = (s.players.length - 1) - (s.turnsSinceWin || 0);
+              return `<div class="dart-roundout-banner">🏁 ${esc(winnerName)} won! ${remaining > 0 ? `${remaining} ${remaining === 1 ? 'player has one more turn' : 'players have one more turn'} to decide the final positions` : 'Final turn'}</div>`;
+            }
+            if (rule === 'finish') {
+              const still = s.players.filter(p => p.score > 0).length;
+              return `<div class="dart-roundout-banner">🏁 ${esc(winnerName)} won! ${still > 0 ? `${still} ${still === 1 ? 'player still needs' : 'players still need'} to reach 0 — playing for 2nd and 3rd place` : 'Everyone has finished!'}<button class="dart-roundout-end" onclick="_dartForceEnd()" title="End the game now with the current standings">End now →</button></div>`;
+            }
+            return '';
+          })() : ''}
+          ${showStandings ? `<div class="dart-mini-standings">
+            ${standings.slice(0, 4).map((row, place) => {
+              const c = _DART_PALETTE[row.colorIdx || 0];
+              const medal = ['🥇','🥈','🥉'][place] || '';
+              return `<span class="dart-mini-row" style="--p-color:${c.hex}">${medal} ${esc(row.name)} <b>${row.points}p</b></span>`;
+            }).join('')}
+          </div>` : ''}
+        </div>
+        <div class="dart-topbar-btns">
+          <button class="dart-tb-btn" onclick="_dartShowStats()" title="Show full statistics">📊 Statistics</button>
+          <button class="dart-tb-btn" onclick="_dartUndo()">↶ Turn</button>
+          <button class="dart-tb-btn" onclick="_dartNewGame()">New game</button>
+        </div>
+      </div>
+      <div class="dart-players">
+        ${(() => {
+          // Beregn én gang hvem der holder game-wide bedste/værste runde
+          const hi = _dartHighlights(s);
+          const bestNames  = hi.best  ? hi.best.holders.map(h => h.name)  : [];
+          const worstNames = hi.worst ? hi.worst.holders.map(h => h.name) : [];
+          return s.players.map((p, i) => {
+            const st = _dartStats(p);
+            const c  = _DART_PALETTE[p.colorIdx || 0];
+            const tPts = (s.tournament?.scores?.[p.name]?.points) || 0;
+            const isActive = i === s.currentPlayer;
+            const displayScore = isActive ? previewScore : p.score;
+            // Spilleren får medalje hvis de er BLANDT holderne af game-bedste/værste runde
+            const holdsBest  = bestNames.includes(p.name);
+            const holdsWorst = worstNames.includes(p.name);
+            return `<div class="dart-pcard ${isActive ? 'active' : ''} ${p.score === 0 ? 'won' : ''}" style="--p-color:${c.hex};--p-color-light:${c.light}">
+              <div class="dart-pcard-left">
+                <div class="dart-pname"><span class="dart-pdot"></span>${esc(p.name)}${tPts ? `<span class="dart-pcard-pts">${tPts}p</span>` : ''}</div>
+                <div class="dart-pscore">${displayScore}</div>
+                <div class="dart-pcard-turnlbl">${isActive ? esc(p.name).toUpperCase() + "'S TURN" : (p.score === 0 ? '🏆 WINNER' : '')}</div>
+              </div>
+              <div class="dart-pcard-right">
+                <div class="dart-pcard-stat">
+                  <span class="dart-pcard-stat-ico">🎯</span>
+                  <div class="dart-pcard-stat-body">
+                    <div class="dart-pcard-stat-lbl">3-dart avg.</div>
+                    <div class="dart-pcard-stat-val">${st.avg3}</div>
+                  </div>
+                </div>
+                <div class="dart-pcard-stat ${holdsBest ? 'is-best' : ''}" ${holdsBest ? 'title="You hold the best round in the game!"' : ''}>
+                  <span class="dart-pcard-stat-ico">🏆</span>
+                  <div class="dart-pcard-stat-body">
+                    <div class="dart-pcard-stat-lbl">Best round</div>
+                    <div class="dart-pcard-stat-val">${st.highest || '—'}</div>
+                  </div>
+                </div>
+                <div class="dart-pcard-stat ${holdsWorst ? 'is-worst' : ''}" ${holdsWorst ? 'title="You hold the worst round in the game"' : ''}>
+                  <span class="dart-pcard-stat-ico">💩</span>
+                  <div class="dart-pcard-stat-body">
+                    <div class="dart-pcard-stat-lbl">Worst round</div>
+                    <div class="dart-pcard-stat-val">${st.lowest || '—'}</div>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+          }).join('');
+        })()}
+      </div>
+
+      <div class="dart-turn-bar">
+        <div class="dart-turn-name">${esc(player.name)}'s turn</div>
+        <div class="dart-darts">
+          ${[0,1,2].map(i => {
+            const d = s.pendingDarts[i];
+            return `<div class="dart-slot ${d ? 'filled' : ''} ${i === s.pendingDarts.length && s.pendingDarts.length < 3 ? 'next' : ''}">
+              <div class="dart-slot-lbl">Dart ${i+1}</div>
+              <div class="dart-slot-val">${d ? d.label : '—'}</div>
+              ${d ? `<div class="dart-slot-pts">${d.value} p</div>` : ''}
+            </div>`;
+          }).join('')}
+        </div>
+        <button class="dart-finish-btn ${s.pendingDarts.length > 0 ? 'on' : ''}" onclick="_dartFinishTurn()" ${s.pendingDarts.length === 0 ? 'disabled' : ''}>
+          Finish →
+        </button>
+      </div>
+
+      ${(() => {
+        if (!s.doubleOut) return '';
+        const dartsLeft = 3 - s.pendingDarts.length;
+        const checkout = _dartCheckout(previewScore, dartsLeft);
+        if (!checkout) return '';
+        return `<div class="dart-checkout">
+          <span class="dart-checkout-lbl">Aim for</span>
+          <span class="dart-checkout-val">${esc(checkout)}</span>
+          <span class="dart-checkout-meta">to finish on ${previewScore}</span>
+        </div>`;
+      })()}
+
+      <div class="dart-mult-row">
+        <button class="dart-mult ${s.multiplier === 1 ? 'on' : ''}" onclick="_dartSetMult(1)">Single ×1</button>
+        <button class="dart-mult ${s.multiplier === 2 ? 'on' : ''}" onclick="_dartSetMult(2)">Double ×2</button>
+        <button class="dart-mult ${s.multiplier === 3 ? 'on' : ''}" onclick="_dartSetMult(3)">Triple ×3</button>
+      </div>
+
+      <div class="dart-board-grid">
+        ${Array.from({length:20}, (_,i) => i+1).map(n => {
+          const m = s.multiplier;
+          const val = (n === 25 ? 25 : n) * m;
+          const lbl = m === 1 ? `${n}` : (m === 2 ? `D${n}` : `T${n}`);
+          // Vis kun under-label når multiplier er aktiv (D/T) — ellers er det redundant
+          const sub = m > 1 ? `<div class="dart-num-v">${lbl} = ${val}</div>` : '';
+          return `<button class="dart-num" onclick="_dartHit(${n})">
+            <div class="dart-num-n">${n}</div>
+            ${sub}
+          </button>`;
+        }).join('')}
+        <button class="dart-num dart-num-bull" onclick="_dartHitBull(25)">
+          <div class="dart-num-n">25</div>
+          <div class="dart-num-v">BULL</div>
+        </button>
+        <button class="dart-num dart-num-bull dart-num-bullseye" onclick="_dartHitBull(50)">
+          <div class="dart-num-n">50</div>
+          <div class="dart-num-v">BULLSEYE</div>
+        </button>
+        <button class="dart-num dart-num-miss" onclick="_dartHit(0)">
+          <div class="dart-num-n">0</div>
+          <div class="dart-num-v">MISS</div>
+        </button>
+        <button class="dart-num dart-num-undo" onclick="_dartUndoDart()" title="Undo last dart">
+          <div class="dart-num-n">↺</div>
+          <div class="dart-num-v">Undo dart</div>
+        </button>
+      </div>
+
+      <div class="dart-bottom-bar">
+        ${(() => {
+          const hi  = _dartHighlights(s);       // runde (3-pil tur)
+          const hiD = _dartHighlightsDarts(s);  // kast (enkelt pil)
+          const sideEmpty = '<div class="dart-banter-side-empty">No throws yet</div>';
+          // Render alle holdere som farve-prik + navn (komma-separeret hvis flere)
+          const holdersHtml = (holders) => holders.map(h => {
+            const col = _DART_PALETTE[h.colorIdx || 0];
+            return `<span class="dart-banter-who-chip"><span class="dart-banter-dot" style="background:${col.hex};box-shadow:0 0 10px ${col.hex}"></span>${esc(h.name)}</span>`;
+          }).join('<span class="dart-banter-who-sep">·</span>');
+          const statRow = (key, hl) => hl ? `
+            <div class="dart-banter-stat-row${hl.holders.length > 1 ? ' is-tied' : ''}">
+              <span class="dart-banter-stat-key">${key}</span>
+              <span class="dart-banter-stat-num">${hl.value}</span>
+              <span class="dart-banter-stat-who">${holdersHtml(hl.holders)}${hl.holders.length > 1 ? ' <span class="dart-banter-tied">tied</span>' : ''}</span>
+            </div>` : '';
+          return `<div class="dart-banter-row">
+            <div class="dart-banter-side dart-banter-best">
+              <div class="dart-banter-side-lbl">🏆 Best</div>
+              ${(hi.best || hiD.best) ? `<div class="dart-banter-stats">
+                ${statRow('Round', hi.best)}
+                ${statRow('Dart',  hiD.best)}
+              </div>` : sideEmpty}
+            </div>
+            <div class="dart-commentary" title="Commentator">
+              <span class="dart-commentary-mic">🎯</span>
+              <span class="dart-commentary-text">${esc(_dartCommentary(s))}</span>
+            </div>
+            <div class="dart-banter-side dart-banter-worst">
+              <div class="dart-banter-side-lbl">⚠ Worst</div>
+              ${(hi.worst || hiD.worst) ? `<div class="dart-banter-stats">
+                ${statRow('Round', hi.worst)}
+                ${statRow('Dart',  hiD.worst)}
+              </div>` : sideEmpty}
+            </div>
+          </div>`;
+        })()}
+      </div>
+    </div>`;
+}
+
+function _dartSetMult(m) {
+  if (!_dartState) return;
+  _dartState.multiplier = m;
+  _saveDart();
+  renderDart();
+}
+function _dartHit(n) {
+  if (!_dartState) return;
+  const s = _dartState;
+  if (s.pendingDarts.length >= 3) { toast('Already 3 darts — press Finish'); return; }
+  const m = s.multiplier;
+  const val = n * m;
+  let label;
+  if (n === 0) label = '—';
+  else if (m === 2) label = `D${n}`;
+  else if (m === 3) label = `T${n}`;
+  else label = `${n}`;
+  s.pendingDarts.push({ value: val, label, isDouble: m === 2, isBull: false });
+  // Reset multiplier til single efter hvert kast (forhindrer at man glemmer)
+  s.multiplier = 1;
+  _saveDart();
+  renderDart();
+  // Auto-færdiggør hvis spilleren ramte præcis 0
+  const p = s.players[s.currentPlayer];
+  const sum = s.pendingDarts.reduce((a, d) => a + d.value, 0);
+  if (p.score - sum === 0 && s.pendingDarts.length <= 3) {
+    setTimeout(() => _dartFinishTurn(), 200);
+  }
+}
+function _dartHitBull(v) {
+  if (!_dartState) return;
+  const s = _dartState;
+  if (s.pendingDarts.length >= 3) { toast('Already 3 darts — press Finish'); return; }
+  s.pendingDarts.push({
+    value: v,
+    label: v === 50 ? 'Bullseye' : 'Bull',
+    isDouble: v === 50,   // bullseye tæller som double i double-out reglen
+    isBull: true,
+  });
+  s.multiplier = 1;
+  _saveDart();
+  renderDart();
+  const p = s.players[s.currentPlayer];
+  const sum = s.pendingDarts.reduce((a, d) => a + d.value, 0);
+  if (p.score - sum === 0 && s.pendingDarts.length <= 3) {
+    setTimeout(() => _dartFinishTurn(), 200);
+  }
+}
+function _dartUndoDart() {
+  if (!_dartState) return;
+  if (!_dartState.pendingDarts.length) { toast('No darts to undo'); return; }
+  _dartState.pendingDarts.pop();
+  _saveDart();
+  renderDart();
+}
+function _dartFinishTurn() {
+  if (!_dartState) return;
+  const s = _dartState;
+  if (!s.pendingDarts.length) { toast('Throw at least one dart first'); return; }
+  const player = s.players[s.currentPlayer];
+  const dartLabels = s.pendingDarts.map(d => d.label);
+  const val = s.pendingDarts.reduce((a, d) => a + d.value, 0);
+  const lastDart = s.pendingDarts[s.pendingDarts.length - 1];
+  const newScore = player.score - val;
+
+  let bust = false;
+  if (newScore < 0)                                                       bust = true;
+  else if (newScore === 1 && s.doubleOut)                                 bust = true;  // kan ikke slutte på 1 ved double-out
+  else if (newScore === 0 && s.doubleOut && !lastDart.isDouble)           bust = true;  // skal slutte på en double
+
+  if (bust) {
+    player.history.push({ throw: val, darts: dartLabels, score: player.score, bust: true });
+    toast(`BUST! ${player.name} scored no points`);
+  } else {
+    player.history.push({ throw: val, darts: dartLabels, score: newScore, bust: false });
+    player.score = newScore;
+    player.totalThrown += val;
+    if (val > player.highest) player.highest = val;
+  }
+
+  // Winner-håndtering — afhænger af endRule ('first' | 'round' | 'finish')
+  const rule = _dartEndRule(s);
+
+  // Hvis spilleren netop nåede 0, registrer det
+  if (player.score === 0 && player.finishedAt == null) {
+    s.finishCount = (s.finishCount || 0) + 1;
+    player.finishedAt = s.finishCount;
+    if (s.winner == null) s.winner = s.currentPlayer;
+    if (s.winner === s.currentPlayer && (rule === 'round' || rule === 'finish')) {
+      // Lige blevet vinder — start round-out tæller (selv for finish-mode bruger vi den til intet)
+      s.turnsSinceWin = 0;
+    }
+    if (rule === 'first') {
+      // Klassisk regel: stop med det samme
+      _awardTournamentPoints();
+      s.pendingDarts = [];
+      s.multiplier = 1;
+      _saveDart();
+      renderDart();
+      return;
+    }
+  } else if (s.winner != null && rule === 'round') {
+    s.turnsSinceWin = (s.turnsSinceWin || 0) + 1;
+  }
+
+  // 'round' slutter når alle har spillet deres sidste tur (N-1 ekstra ture)
+  if (rule === 'round' && s.winner != null && (s.turnsSinceWin || 0) >= s.players.length - 1) {
+    _awardTournamentPoints();
+    s.pendingDarts = [];
+    s.multiplier = 1;
+    _saveDart();
+    renderDart();
+    return;
+  }
+
+  // 'finish' slutter når ALLE spillere er på 0
+  if (rule === 'finish' && s.players.every(p => p.score === 0)) {
+    _awardTournamentPoints();
+    s.pendingDarts = [];
+    s.multiplier = 1;
+    _saveDart();
+    renderDart();
+    return;
+  }
+
+  // Advance til næste spiller
+  s.currentPlayer = (s.currentPlayer + 1) % s.players.length;
+
+  // I 'round' og 'finish' skal spillere ved 0 springes over
+  if (rule === 'round' || rule === 'finish') {
+    let safety = 0;
+    while (s.players[s.currentPlayer].score === 0 && safety < s.players.length) {
+      s.currentPlayer = (s.currentPlayer + 1) % s.players.length;
+      safety++;
+    }
+    // Sikkerhed: alle er ved 0 — slut spillet
+    if (s.players.every(p => p.score === 0)) {
+      _awardTournamentPoints();
+      s.pendingDarts = [];
+      s.multiplier = 1;
+      _saveDart();
+      renderDart();
+      return;
+    }
+  }
+  s.pendingDarts = [];
+  s.multiplier = 1;
+  _saveDart();
+  renderDart();
+}
+
+// Uddel turneringspoint efter et spil: 1.plads = N point, 2.plads = N-1, osv.
+// Placering: vinder først, derefter sorteret efter laveste resterende score.
+function _awardTournamentPoints() {
+  const s = _dartState;
+  if (!s.tournament) s.tournament = { _gameNumber: 1, scores: {} };
+  if (!s.tournament.scores) s.tournament.scores = {};
+
+  const mode = _dartGameMode(s);
+  const playersByPlace = s.players
+    .map((p, idx) => ({ p, idx }))
+    .sort((a, b) => {
+      const aDone = a.p.finishedAt != null;
+      const bDone = b.p.finishedAt != null;
+      if (aDone && bDone) return a.p.finishedAt - b.p.finishedAt;
+      if (aDone) return -1;
+      if (bDone) return 1;
+      // ATC: højere atcTarget = bedre (længere fremme). X01: lavere score = bedre.
+      if (mode === 'aroundclock') return (b.p.atcTarget || 0) - (a.p.atcTarget || 0);
+      return a.p.score - b.p.score;
+    });
+  const N = s.players.length;
+  playersByPlace.forEach(({ p }, place) => {
+    const pts = N - place;
+    if (!s.tournament.scores[p.name]) {
+      s.tournament.scores[p.name] = { points: 0, wins: 0, games: 0, colorIdx: p.colorIdx };
+    }
+    s.tournament.scores[p.name].points += pts;
+    s.tournament.scores[p.name].games += 1;
+    if (place === 0) s.tournament.scores[p.name].wins += 1;
+  });
+  s.tournament._gameNumber = s.gameNumber || 1;
+}
+
+function _dartNextGame() {
+  // Fortsæt turnering: samme spillere, samme regler, akkumulerede point
+  if (!_dartState) return;
+  const s = _dartState;
+  const names = s.players.map(p => p.name);
+  _dartState = _newDartGame(s.startScore, names, s.doubleOut, s.tournament, s.theme, _dartEndRule(s), _dartGameMode(s), s.cricketVariant);
+  _saveDart();
+  renderDart();
+}
+
+function _dartEndTournament() {
+  if (!confirm('End the tournament and return to setup? Points will be reset.')) return;
+  if (_dartState) {
+    _dartState.setupDone = false;
+    _dartState.tournament = { _gameNumber: 1, scores: {} };
+    _dartState.gameNumber = 1;
+  }
+  _saveDart();
+  renderDart();
+}
+window._dartNextGame = _dartNextGame;
+window._dartEndTournament = _dartEndTournament;
+
+// Afslut 'finish'-mode spil manuelt (bruges når sidste spillere ikke kan finishe)
+function _dartForceEnd() {
+  if (!_dartState) return;
+  if (!confirm('End the game now? The remaining players will be ranked by lowest score.')) return;
+  _awardTournamentPoints();
+  _dartState.pendingDarts = [];
+  _dartState.multiplier = 1;
+  _saveDart();
+  renderDart();
+}
+window._dartForceEnd = _dartForceEnd;
+function _dartUndo() {
+  if (!_dartState) return;
+  const s = _dartState;
+  // Hvis spilleren er i gang med en tur (har pendingDarts), ryd dem
+  if (s.pendingDarts && s.pendingDarts.length) {
+    s.pendingDarts = [];
+    s.multiplier = 1;
+    _saveDart();
+    renderDart();
+    return;
+  }
+  // Find sidste spiller der kastede (forrige i rækkefølge eller vinder)
+  let prevIdx;
+  if (s.playRoundOut && s.winner != null && (s.turnsSinceWin || 0) > 0) {
+    // I "spil runden færdig"-fasen — gå tilbage til forrige spiller (springer 0-scorere over)
+    let p = (s.currentPlayer - 1 + s.players.length) % s.players.length;
+    let safety = 0;
+    while (s.players[p].score === 0 && p !== s.winner && safety < s.players.length) {
+      p = (p - 1 + s.players.length) % s.players.length;
+      safety++;
+    }
+    prevIdx = p;
+    s.turnsSinceWin = Math.max(0, (s.turnsSinceWin || 0) - 1);
+  } else if (s.winner != null) {
+    // Winner lige fundet (eller playRoundOut er off) — gå tilbage til vinder selv
+    prevIdx = s.winner;
+    s.winner = null;
+    s.turnsSinceWin = 0;
+  } else {
+    prevIdx = (s.currentPlayer - 1 + s.players.length) % s.players.length;
+  }
+  const player = s.players[prevIdx];
+  const last = player.history.pop();
+  if (!last) { toast('No turns to undo'); return; }
+  if (!last.bust) {
+    player.score += last.throw;
+    player.totalThrown -= last.throw;
+    player.highest = player.history.reduce((m, h) => h.bust ? m : Math.max(m, h.throw), 0);
+  }
+  s.currentPlayer = prevIdx;
+  s.pendingDarts = [];
+  s.multiplier = 1;
+  _saveDart();
+  renderDart();
+}
+function _dartNewGame() {
+  if (!confirm('Start a new game? The current game will be lost.')) return;
+  if (_dartState) _dartState.setupDone = false;
+  _saveDart();
+  renderDart();
+}
+window._dartSetMult = _dartSetMult;
+window._dartHit = _dartHit;
+window._dartHitBull = _dartHitBull;
+window._dartUndoDart = _dartUndoDart;
+window._dartFinishTurn = _dartFinishTurn;
+window._dartUndo = _dartUndo;
+window._dartNewGame = _dartNewGame;
+
+// Vis fuld statistik-tabel som modal (åbnes fra 📊-knap i topbar)
+function _dartShowStats() {
+  const s = _dartState;
+  if (!s || !s.players) return;
+  const rows = s.players.map((p, i) => {
+    const st = _dartStats(p);
+    const c  = _DART_PALETTE[p.colorIdx || 0];
+    return `<tr class="${i === s.currentPlayer ? 'is-current' : ''}" style="--p-color:${c.hex}">
+      <td><b><span class="dart-stat-dot"></span>${esc(p.name)}</b></td>
+      <td><b>${p.score}</b></td>
+      <td>${st.avg3}</td><td>${st.avg1}</td><td>${st.first9Avg || '—'}</td>
+      <td>${st.dartsThrown}</td>
+      <td>${st.highest}</td>
+      <td>${st.n180 || '—'}</td><td>${st.n140 || '—'}</td>
+      <td>${st.n100 || '—'}</td><td>${st.busts || '—'}</td>
+    </tr>`;
+  }).join('');
+  const html = `
+    <div class="dart-stats-modal">
+      <div class="dart-stats-modal-head">
+        <div class="dart-stats-modal-title">📊 Game Statistics</div>
+        <div class="dart-stats-modal-sub">Game ${s.gameNumber || 1} · ${s.startScore}${s.doubleOut ? ' · Double out' : ''}</div>
+      </div>
+      <div class="dart-winner-table-wrap">
+        <table class="dart-winner-table">
+          <thead>
+            <tr><th>Player</th><th>Score</th><th>3-dart</th><th>1-dart</th><th>First 9</th><th>Darts</th><th>★</th><th>180</th><th>140+</th><th>100+</th><th>Bust</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div class="dart-stats-modal-foot">
+        <button class="dart-tb-btn" onclick="closeModal()">Close</button>
+      </div>
+    </div>`;
+  openModal(html, { wide: true });
+}
+window._dartShowStats = _dartShowStats;
+
+function _renderDartWinner(ov) {
+  const s = _dartState;
+  ov.setAttribute('data-theme', s.theme || 'klassisk');
+  const winner = s.players[s.winner];
+  const winSt = _dartStats(winner);
+  const winColor = _DART_PALETTE[winner.colorIdx || 0];
+  const gameNum = s.gameNumber || 1;
+
+  // Turnerings-standings sorteret efter point
+  const tScores = (s.tournament && s.tournament.scores) || {};
+  const standings = Object.entries(tScores)
+    .map(([name, d]) => ({ name, ...d }))
+    .sort((a, b) => b.points - a.points || b.wins - a.wins);
+
+  ov.innerHTML = `
+    <div class="dart-winner" style="--win-color:${winColor.hex}">
+      <div class="dart-trophy">🏆</div>
+      <div class="dart-winner-lbl">Winner of game ${gameNum}</div>
+      <div class="dart-winner-name">${esc(winner.name)}</div>
+      <div class="dart-winner-stats">
+        <div><b>${winSt.avg3}</b><span>3-dart avg</span></div>
+        <div><b>${winSt.avg1}</b><span>1-dart avg</span></div>
+        <div><b>${winSt.dartsThrown}</b><span>darts thrown</span></div>
+        <div><b>${winSt.highest}</b><span>highest turn</span></div>
+      </div>
+
+      ${standings.length ? `
+        <div class="dart-standings-wrap">
+          <div class="dart-standings-title">🏅 Tournament standings after game ${gameNum}</div>
+          <div class="dart-standings">
+            ${standings.map((row, place) => {
+              const c = _DART_PALETTE[row.colorIdx || 0];
+              const medal = ['🥇','🥈','🥉'][place] || `${place+1}.`;
+              return `<div class="dart-stand-row" style="--p-color:${c.hex}">
+                <div class="dart-stand-place">${medal}</div>
+                <div class="dart-stand-name">${esc(row.name)}</div>
+                <div class="dart-stand-meta">${row.wins} wins · ${row.games} games</div>
+                <div class="dart-stand-pts"><b>${row.points}</b><span>points</span></div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>` : ''}
+
+      <details class="dart-game-stats-fold">
+        <summary>Show game statistics</summary>
+        <div class="dart-winner-table-wrap">
+          <table class="dart-winner-table">
+            <thead>
+              <tr><th>Player</th><th>3-dart</th><th>1-dart</th><th>Darts</th><th>★</th><th>180</th><th>140+</th><th>100+</th><th>Bust</th></tr>
+            </thead>
+            <tbody>
+              ${s.players.map((p, i) => {
+                const st = _dartStats(p);
+                return `<tr class="${i === s.winner ? 'is-winner' : ''}">
+                  <td><b>${esc(p.name)}</b>${i === s.winner ? ' 🏆' : ''}</td>
+                  <td>${st.avg3}</td><td>${st.avg1}</td><td>${st.dartsThrown}</td>
+                  <td>${st.highest}</td>
+                  <td>${st.n180 || '—'}</td><td>${st.n140 || '—'}</td>
+                  <td>${st.n100 || '—'}</td><td>${st.busts || '—'}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <div class="dart-winner-btns">
+        <button class="dart-start-btn" onclick="_dartNextGame()">Next game →</button>
+        <button class="dart-tb-btn" onclick="_dartEndTournament()">End tournament</button>
+        <button class="dart-tb-btn" onclick="_dartUndo()">↶ Undo last turn</button>
+      </div>
+    </div>`;
+}
+function _dartRematch() {
+  if (!_dartState) return;
+  const names = _dartState.players.map(p => p.name);
+  _dartState = _newDartGame(_dartState.startScore, names, _dartState.doubleOut);
+  _saveDart();
+  renderDart();
+}
+window._dartRematch = _dartRematch;
+
+// ── Standalone-opstart ──
+(function _dartStandaloneBoot() {
+  const ov = $('dart-ov');
+  if (!ov) return;
+  ov.style.display = 'flex';
+  renderDart();
+})();
+</script>
+</body>
+</html>
