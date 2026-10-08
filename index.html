@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10130f">
+  <title>Dart 501 · Download Counter</title>
+  <style>
+    :root{color-scheme:dark;--bg:#10130f;--panel:#1a201a;--line:#364334;--gold:#e1bd70;--muted:#a7b3a4;--white:#f4f3e9}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;padding:28px;background:radial-gradient(ellipse at 50% 10%,#283625 0%,#10130f 62%);color:var(--white);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+    main{width:min(100%,580px)}
+    header{text-align:center;margin-bottom:26px}
+    .eyebrow{letter-spacing:.32em;text-transform:uppercase;font-size:11px;font-weight:800;color:var(--gold)}
+    h1{font-size:clamp(40px,9vw,66px);line-height:1;margin:14px 0 8px;letter-spacing:-.05em}
+    .sub{color:var(--muted);margin:0;font-size:15px}
+    .card{padding:clamp(26px,6vw,44px);border:1px solid var(--line);border-radius:24px;background:linear-gradient(160deg,#20291f,#171c17);box-shadow:0 25px 65px #0006;text-align:center}
+    .bull{width:76px;height:76px;margin:0 auto 24px;border-radius:50%;background:repeating-radial-gradient(circle,#d5be8e 0 8px,#a63229 9px 17px,#243e2b 18px 26px,#d5be8e 27px 32px);border:5px solid #485441;display:grid;place-items:center;box-shadow:0 6px 22px #0006}
+    .bull span{width:18px;height:18px;border-radius:50%;background:#dfbb72;border:3px solid #922820}
+    .label{font-size:12px;color:var(--muted);font-weight:750;text-transform:uppercase;letter-spacing:.19em}
+    .count{font-size:clamp(78px,18vw,132px);font-variant-numeric:tabular-nums;line-height:1.13;letter-spacing:-.075em;font-weight:800;margin:12px 0 4px;color:var(--gold)}
+    .version{color:var(--muted);font-size:13px}
+    .button{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:28px;padding:17px 20px;border-radius:12px;text-decoration:none;font-weight:800;background:var(--gold);color:#1b2118;transition:background .2s}
+    .button:hover{background:#f1d69b}
+    .row{display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:19px;font-size:12px;color:var(--muted)}
+    button{border:0;color:var(--gold);background:transparent;cursor:pointer;text-decoration:underline;font:inherit;padding:5px}
+    .dot{width:7px;height:7px;display:inline-block;background:#73c48b;border-radius:50%;margin-right:4px}
+    .dot.bad{background:#df8a70}
+    footer{text-align:center;color:var(--muted);font-size:12px;line-height:1.6;margin-top:20px}
+    footer a{color:var(--gold)}
+  </style>
+</head>
+<body>
+  <main>
+    <header><div class="eyebrow">Dantyr presents</div><h1>DART <span style="color:var(--gold)">501</span></h1><p class="sub">Download statistics · Version 1.0</p></header>
+    <section class="card" aria-label="Download statistics">
+      <div class="bull" aria-hidden="true"><span></span></div>
+      <div class="label">Total downloads</div>
+      <div class="count" id="downloads" aria-live="polite">–</div>
+      <div class="version" id="status">Fetching downloads from GitHub…</div>
+      <a id="download" class="button" href="https://github.com/dantyr2/Dart-test/releases/download/V1.0/dart-english.html">↓ Download Dart 501 for free</a>
+      <div class="row"><span id="connection"><span class="dot"></span> GitHub Releases</span><span>·</span><button type="button" id="refresh">Refresh count</button></div>
+    </section>
+    <footer>This counter tracks downloads of <strong>dart-english.html</strong> as a GitHub Release asset.<br>It does not count page views or unique visitors.<br><a href="https://github.com/dantyr2/Dart-test/releases/latest" target="_blank" rel="noopener noreferrer">View release on GitHub ↗</a></footer>
+  </main>
+  <script>
+    const api='https://api.github.com/repos/dantyr2/Dart-test/releases/latest';
+    const count=document.getElementById('downloads');
+    const status=document.getElementById('status');
+    const conn=document.getElementById('connection');
+    async function update(){
+      status.textContent='Fetching downloads from GitHub…';
+      try{
+        const response=await fetch(api,{cache:'no-store',headers:{'Accept':'application/vnd.github+json'}});
+        if(!response.ok) throw new Error('HTTP '+response.status);
+        const release=await response.json();
+        const asset=(release.assets||[]).find(a=>a.name==='dart-english.html');
+        if(!asset)throw new Error('Release asset not found');
+        count.textContent=new Intl.NumberFormat('en-US').format(asset.download_count);
+        status.textContent='Last updated at '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+        document.getElementById('download').href=asset.browser_download_url;
+        conn.innerHTML='<span class="dot"></span> GitHub Releases';
+      }catch(err){
+        status.textContent='Unable to fetch download count right now';
+        conn.innerHTML='<span class="dot bad"></span> Connection error';
+        console.error('Download counter:',err);
+      }
+    }
+    document.getElementById('refresh').addEventListener('click',update);
+    update();
+    setInterval(update,60000);
+  </script>
+</body>
+</html>
